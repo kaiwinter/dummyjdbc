@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="compile" name="DummyJdbc">
+
+	<property name="lib.dir" location="../lib" />
+	
+	<taskdef classpath="../lib/aspectjtools.jar" resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" />
+
+	<path id="build.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+				
+	<target name="init">
+		<tstamp />
+
+		<property name="build" value="../bin/ant" />
+		<property name="src" value="../src" />
+		<property name="dist" value="${build}/dist" />
+	</target>
+
+	<target name="clean" depends="init">
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+	</target>
+
+	<target name="prepare" depends="init">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build}/classes" />
+		<mkdir dir="${build}/src" />
+
+		<copy todir="${build}/src">
+			<fileset dir="${src}" includes="**/*.java,**/*.aj" />
+		</copy>
+	</target>
+
+	<target name="compile" depends="init,prepare">
+		<iajc source="1.6" sourceroots="${build}/src" destdir="${build}/classes" encoding="latin1" classpathref="build.classpath" />
+	</target>
+
+	<target name="jar" depends="clean,compile">
+		<mkdir dir="${dist}" />
+		<jar basedir="${build}/classes" includes="**/*" jarfile="${dist}/${ant.project.name}.jar">
+			<manifest>
+				<attribute name="Implementation-Title" value="Dummy JDBC Driver" />
+				<attribute name="Main-Class" value="com.google.dummyjdbc.DummyJdbcDriver" />
+			</manifest>
+		</jar>
+	</target>
+
+</project>

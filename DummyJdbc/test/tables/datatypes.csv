@@ -1,0 +1,2 @@
+string_column, 	int_column,	boolean_column,	bigdecimal_column
+string_value, 	17, 		true, 			123456789123456789
