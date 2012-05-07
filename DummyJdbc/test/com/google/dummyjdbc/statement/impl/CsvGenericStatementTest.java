@@ -1,5 +1,7 @@
 package com.google.dummyjdbc.statement.impl;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -12,17 +14,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.dummyjdbc.DummyJdbcDriver;
-import com.google.dummyjdbc.statement.impl.CsvStatement;
-
 
 public final class CsvGenericStatementTest {
 
 	private ResultSet resultSet;
 
 	@Before
-	public void setup() throws ClassNotFoundException, SQLException {
+	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
+		DummyJdbcDriver.registerTableRessource("test_table", new File(CsvGenericStatementTest.class.getResource(
+				"test_table.csv").toURI()));
 		Connection connection = DriverManager.getConnection("any");
 		Statement statement = connection.createStatement();
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="compile" name="DummyJdbc">
+<project basedir="." default="compile" name="dummyjdbc">
 
 	<property name="lib.dir" location="../lib" />
 	
@@ -38,9 +38,10 @@
 		<iajc source="1.6" sourceroots="${build}/src" destdir="${build}/classes" encoding="latin1" classpathref="build.classpath" />
 	</target>
 
-	<target name="jar" depends="clean,compile">
+	<target name="jar-with-dependencies" depends="clean,compile">
 		<mkdir dir="${dist}" />
 		<jar basedir="${build}/classes" includes="**/*" jarfile="${dist}/${ant.project.name}.jar">
+			<zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
 			<manifest>
 				<attribute name="Implementation-Title" value="Dummy JDBC Driver" />
 				<attribute name="Main-Class" value="com.google.dummyjdbc.DummyJdbcDriver" />
