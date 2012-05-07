@@ -1,6 +1,8 @@
 package com.google.dummyjdbc.statement.impl;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,19 +16,17 @@ import org.junit.Test;
 
 import com.google.dummyjdbc.DummyJdbcDriver;
 
-
 public final class DatatypesTest {
 
 	private ResultSet resultSet;
 
 	@Before
-	public void setup() throws ClassNotFoundException, SQLException {
+	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
+		DummyJdbcDriver.registerTableRessource("datatypes", new File(CsvGenericStatementTest.class.getResource(
+				"datatypes.csv").toURI()));
 		Connection connection = DriverManager.getConnection("any");
-		// PreparedStatement prepareStatement =
-		// connection.prepareStatement("SELECT * FROM datatypes");
-		// resultSet = prepareStatement.executeQuery();
 		Statement statement = connection.createStatement();
 		resultSet = statement.executeQuery("SELECT * FROM datatypes");
 
