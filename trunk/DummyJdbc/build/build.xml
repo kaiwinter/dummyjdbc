@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="compile" name="dummyjdbc">
 
-	<property name="lib.dir" location="../lib" />
+	<property name="version" value="1.0"/>
 	
+	<property name="lib.dir" location="../lib" />
+
 	<taskdef classpath="../lib/aspectjtools.jar" resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" />
 
 	<path id="build.classpath">
@@ -10,7 +12,7 @@
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
-				
+
 	<target name="init">
 		<tstamp />
 
@@ -38,14 +40,15 @@
 		<iajc source="1.6" sourceroots="${build}/src" destdir="${build}/classes" encoding="latin1" classpathref="build.classpath" />
 	</target>
 
+	<target name="jar" depends="clean,compile">
+		<mkdir dir="${dist}" />
+		<jar basedir="${build}/classes" includes="**/*" jarfile="${dist}/${ant.project.name}-${version} .jar" />
+	</target>
+
 	<target name="jar-with-dependencies" depends="clean,compile">
 		<mkdir dir="${dist}" />
-		<jar basedir="${build}/classes" includes="**/*" jarfile="${dist}/${ant.project.name}.jar">
-			<zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
-			<manifest>
-				<attribute name="Implementation-Title" value="Dummy JDBC Driver" />
-				<attribute name="Main-Class" value="com.google.dummyjdbc.DummyJdbcDriver" />
-			</manifest>
+		<jar basedir="${build}/classes" includes="**/*" jarfile="${dist}/${ant.project.name}-${version}-all.jar">
+			<zipgroupfileset dir="${lib.dir}" includes="*.jar" />
 		</jar>
 	</target>
 
