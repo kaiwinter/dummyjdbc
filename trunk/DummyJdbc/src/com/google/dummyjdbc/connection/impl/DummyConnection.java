@@ -22,6 +22,10 @@ public class DummyConnection extends ConnectionAdapter {
 
 	private Map<String, File> tableResources;
 
+	/**
+	 * Constructs a new {@link DummyConnection}.
+	 * @param tableResources {@link Map} of table name to CSV file.
+	 */
 	public DummyConnection(Map<String, File> tableResources) {
 		this.tableResources = tableResources;
 	}

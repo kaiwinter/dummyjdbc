@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: QAS Checks
+    Checkstyle-Configuration: Checkstyle config
     Description: none
 -->
 <module name="Checker">

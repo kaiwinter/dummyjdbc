@@ -20,7 +20,7 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	/**
 	 * Constructs a new {@link CsvPreparedStatement}.
 	 *
-	 * @param tableResources
+	 * @param tableResources {@link Map} of table name to CSV file.
 	 * @param sql
 	 *            the SQL statement.
 	 */

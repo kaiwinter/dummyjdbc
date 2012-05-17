@@ -36,6 +36,10 @@ public final class CsvStatement extends StatementAdapter {
 
 	private final Map<String, File> tableResources;
 
+	/**
+	 * Constructs a new {@link CsvStatement}.
+	 * @param tableResources {@link Map} of table name to CSV file.
+	 */
 	public CsvStatement(Map<String, File> tableResources) {
 		this.tableResources = tableResources;
 	}
