@@ -1,0 +1,18 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+==Features==
+   * Ignoring JDBC queries and returning an empty ResultSet for any query (integration mode)
+   * Return values which are parsed from CSV files as ResultSet (JUnit mode)
+
+
+== Usage ==
+dummyjdbc can be used for two different scenarios. 
+
+== Integration mode ==
+In this scenario you want to test (or just run) an application on a test system where you don't have access to the database. The focus is here on different things than the database so it is ok to not get any data from the database.
+===Requirement===
+The database driver have to be configureable to let the application use dummyjdbc
+
+== JUnit mode ==
+===Requirement===
