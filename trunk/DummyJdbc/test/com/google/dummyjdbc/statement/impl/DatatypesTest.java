@@ -24,7 +24,7 @@ public final class DatatypesTest {
 	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
-		DummyJdbcDriver.registerTableRessource("datatypes", new File(CsvGenericStatementTest.class.getResource(
+		DummyJdbcDriver.addTableResource("datatypes", new File(CsvGenericStatementTest.class.getResource(
 				"datatypes.csv").toURI()));
 		Connection connection = DriverManager.getConnection("any");
 		Statement statement = connection.createStatement();

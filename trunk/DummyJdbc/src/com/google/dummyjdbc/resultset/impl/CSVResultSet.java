@@ -3,6 +3,7 @@ package com.google.dummyjdbc.resultset.impl;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,10 +15,22 @@ import com.google.dummyjdbc.resultset.DummyResultSet;
 
 /**
  * The {@link CSVResultSet} which iterates over the CSV file data.
- * 
+ *
  * @author Kai Winter
  */
 public class CSVResultSet extends DummyResultSet {
+
+	/**
+	 * The date format for parsing a date from a CSV file.
+	 */
+	private static final String DATE_FORMAT = "dd-MMM-yy";
+
+	private static final ThreadLocal<DateFormat> THREAD_LOCAL_DATEFORMAT = new ThreadLocal<DateFormat>() {
+		@Override
+		protected DateFormat initialValue() {
+			return new SimpleDateFormat(DATE_FORMAT);
+		}
+	};
 
 	/** Column name 2 column value. */
 	private Collection<LinkedHashMap<String, String>> dummyData;
@@ -30,7 +43,7 @@ public class CSVResultSet extends DummyResultSet {
 
 	/**
 	 * Constructs a new {@link CSVResultSet}.
-	 * 
+	 *
 	 * @param entries
 	 *            Collection of entries from the CSV file. Each {@link LinkedHashMap} maps column name to column value.
 	 */
@@ -112,7 +125,7 @@ public class CSVResultSet extends DummyResultSet {
 
 	@Override
 	public Date getDate(String columnLabel) throws SQLException {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yy");
+		DateFormat sdf = THREAD_LOCAL_DATEFORMAT.get();
 		String string = getValueForColumnLabel(columnLabel);
 
 		Date date = null;
@@ -121,7 +134,9 @@ public class CSVResultSet extends DummyResultSet {
 			date = new Date(utilDate.getTime());
 
 		} catch (ParseException e) {
-			System.err.println("Could not parse date: " + string);
+			String message = MessageFormat
+					.format("Could not parse date: {0} using format ''{1}''", string, DATE_FORMAT);
+			System.err.println(message);
 		}
 		return date;
 	}

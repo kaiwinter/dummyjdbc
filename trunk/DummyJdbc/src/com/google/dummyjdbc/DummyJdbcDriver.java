@@ -18,20 +18,17 @@ import com.google.dummyjdbc.connection.impl.DummyConnection;
  *
  * @author Kai Winter
  */
-public class DummyJdbcDriver implements Driver {
+public final class DummyJdbcDriver implements Driver {
 
-	private static Map<String, File> tableRessources = Collections.synchronizedMap(new HashMap<String, File>());
+	private static Map<String, File> tableResources = Collections.synchronizedMap(new HashMap<String, File>());
 
 	static {
 		try {
 			// Register this with the DriverManager
 			DriverManager.registerDriver(new DummyJdbcDriver());
 		} catch (SQLException e) {
+			// ignore
 		}
-	}
-
-	public static File getTableRessource(String filename) {
-		return tableRessources.get(filename.toLowerCase());
 	}
 
 	/**
@@ -39,12 +36,12 @@ public class DummyJdbcDriver implements Driver {
 	 * given <code>csvFile</code> for the given <code>tablename</code> <code>addresses</code> will be used.
 	 *
 	 * @param tablename
-	 *            The name of the database table like in the SQL statement.
+	 *            The name of the database table like in the SQL statement (e.g. addresses).
 	 * @param csvFile
 	 *            A {@link File} object of a CSV file which should be parsed in order to return table data.
 	 */
-	public static void registerTableRessource(String tablename, File csvFile) {
-		tableRessources.put(tablename, csvFile);
+	public static void addTableResource(String tablename, File csvFile) {
+		tableResources.put(tablename, csvFile);
 	}
 
 	@Override
@@ -69,7 +66,7 @@ public class DummyJdbcDriver implements Driver {
 
 	@Override
 	public Connection connect(String url, Properties info) throws SQLException {
-		return new DummyConnection();
+		return new DummyConnection(tableResources);
 	}
 
 	@Override

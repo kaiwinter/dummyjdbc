@@ -8,7 +8,7 @@ import java.sql.Statement;
 
 /**
  * Empty implementation of {@link Statement}. Sub classes should implement the functionality.
- * 
+ *
  * @author Kai Winter
  */
 public abstract class StatementAdapter implements Statement {

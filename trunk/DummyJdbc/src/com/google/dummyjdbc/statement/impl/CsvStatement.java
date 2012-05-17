@@ -6,18 +6,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.CodeSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-import com.google.dummyjdbc.DummyJdbcDriver;
 import com.google.dummyjdbc.resultset.DummyResultSet;
 import com.google.dummyjdbc.resultset.impl.CSVResultSet;
 import com.google.dummyjdbc.statement.StatementAdapter;
@@ -28,10 +29,16 @@ import com.google.dummyjdbc.statement.StatementAdapter;
  *
  * @author Kai Winter
  */
-public class CsvStatement extends StatementAdapter {
+public final class CsvStatement extends StatementAdapter {
 
 	/** Pattern to get table name from an SQL statement. */
 	private static final Pattern TABLENAME_PATTERN = Pattern.compile(".*from (\\S*)\\s?.*", Pattern.CASE_INSENSITIVE);
+
+	private final Map<String, File> tableResources;
+
+	public CsvStatement(Map<String, File> tableResources) {
+		this.tableResources = tableResources;
+	}
 
 	@Override
 	public ResultSet executeQuery(String sql) throws SQLException {
@@ -41,11 +48,14 @@ public class CsvStatement extends StatementAdapter {
 			String tableName = matcher.group(1);
 
 			// Does a text file for the dummy table exist?
-			File ressource = DummyJdbcDriver.getTableRessource(tableName.toLowerCase());
+			File ressource = tableResources.get(tableName.toLowerCase());
 			if (ressource == null) {
-				System.err.println(MessageFormat.format("No table definition found for ''{0}'', using DummyResultSet.",
-						tableName));
-				return new DummyResultSet();
+				// Try to load a file from the ./tables/ directory
+				CodeSource src = CsvStatement.class.getProtectionDomain().getCodeSource();
+
+				String path = src.getLocation().getPath();
+				path = path.substring(0, path.lastIndexOf("/"));
+				ressource = new File(new File(path), "/tables/" + tableName.toLowerCase() + ".csv");
 			}
 
 			FileInputStream dummyTableDataStream = null;
@@ -53,8 +63,9 @@ public class CsvStatement extends StatementAdapter {
 				dummyTableDataStream = new FileInputStream(ressource);
 				return createGenericResultSet(tableName, dummyTableDataStream);
 			} catch (FileNotFoundException e) {
-				System.err.println(MessageFormat.format("No table definition found for ''{0}'', using DummyResultSet.",
-						tableName));
+				String message = MessageFormat.format("No table definition found for ''{0}'', using DummyResultSet.",
+						tableName);
+				System.err.println(message);
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			} finally {
