@@ -1,18 +1,22 @@
-#summary One-sentence summary of this page.
+#summary Basic information
+#labels Featured,Phase-Design
 
 = Introduction =
 ==Features==
-   * Ignoring JDBC queries and returning an empty ResultSet for any query (integration mode)
-   * Return values which are parsed from CSV files as ResultSet (JUnit mode)
+   * Ignoring JDBC queries and returning an empty {{{ResultSet}}} for any query 
+   * Returning values which are parsed from CSV files as {{{ResultSet}}}
 
 
 == Usage ==
-dummyjdbc can be used for two different scenarios. 
+dummyjdbc can be used for different scenarios. 
 
 == Integration mode ==
-In this scenario you want to test (or just run) an application on a test system where you don't have access to the database. The focus is here on different things than the database so it is ok to not get any data from the database.
+In this scenario you want to test (or just run) an application on a test system where you don't have access to a database. So you can use dummyjdbc to either ignore JDBC queries and just return empty {{{ResultSet}}}s, or you create CSV files for the tables you want to access and let dummyjdbc parse them.
+
 ===Requirement===
 The database driver have to be configureable to let the application use dummyjdbc
 
 == JUnit mode ==
+Using dummyjdbc in unit tests is useful if you don't want to create mock objects which are returned by your DAO or if you actually can't mock them. That way you can even test logic in your DAO (which you might have in legacy applications without real architecture).
 ===Requirement===
+The database {{{Connection}}} have to be mockable e.g. by Mockito.
