@@ -23,8 +23,8 @@ public final class CsvGenericStatementTest {
 	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
-		DummyJdbcDriver.registerTableRessource("test_table", new File(CsvGenericStatementTest.class.getResource(
-				"test_table.csv").toURI()));
+		DummyJdbcDriver.addTableResource("test_table",
+				new File(CsvGenericStatementTest.class.getResource("test_table.csv").toURI()));
 		Connection connection = DriverManager.getConnection("any");
 		Statement statement = connection.createStatement();
 

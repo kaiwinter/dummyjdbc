@@ -25,7 +25,7 @@ import java.util.Calendar;
 
 /**
  * Empty implementation of {@link PreparedStatement}. Sub classes should implement the functionality.
- * 
+ *
  * @author Kai Winter
  */
 public class PreparedStatementAdapter implements PreparedStatement {

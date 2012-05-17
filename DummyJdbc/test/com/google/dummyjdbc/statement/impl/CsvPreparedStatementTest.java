@@ -23,7 +23,7 @@ public final class CsvPreparedStatementTest {
 	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
-		DummyJdbcDriver.registerTableRessource("test_table", new File(CsvGenericStatementTest.class.getResource(
+		DummyJdbcDriver.addTableResource("test_table", new File(CsvGenericStatementTest.class.getResource(
 				"test_table.csv").toURI()));
 		Connection connection = DriverManager.getConnection("any");
 		PreparedStatement statement = connection.prepareStatement("SELECT * FROM test_table");

@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * Implementation of {@link ResultSet} which returns default values.
- * 
+ *
  * @author Kai Winter
  */
 public class DummyResultSet implements ResultSet {

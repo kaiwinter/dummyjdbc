@@ -20,7 +20,7 @@ import java.util.Properties;
 
 /**
  * Empty implementation of {@link Connection}. Sub classes should implement the functionality.
- * 
+ *
  * @author Kai Winter
  */
 public class ConnectionAdapter implements Connection {
