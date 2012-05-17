@@ -11,7 +11,7 @@ import java.sql.Statement;
  *
  * @author Kai Winter
  */
-public abstract class StatementAdapter implements Statement {
+public class StatementAdapter implements Statement {
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
@@ -203,5 +203,10 @@ public abstract class StatementAdapter implements Statement {
 	@Override
 	public boolean isPoolable() throws SQLException {
 		return false;
+	}
+
+	@Override
+	public ResultSet executeQuery(String sql) throws SQLException {
+		return null;
 	}
 }
