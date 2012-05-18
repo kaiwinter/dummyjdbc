@@ -4,10 +4,13 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
+import java.util.Locale;
 
 import junit.framework.Assert;
 
@@ -24,8 +27,8 @@ public final class DatatypesTest {
 	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
-		DummyJdbcDriver.addTableResource("datatypes", new File(CsvGenericStatementTest.class.getResource(
-				"datatypes.csv").toURI()));
+		DummyJdbcDriver.addTableResource("datatypes",
+				new File(CsvGenericStatementTest.class.getResource("datatypes.csv").toURI()));
 		Connection connection = DriverManager.getConnection("any");
 		Statement statement = connection.createStatement();
 		resultSet = statement.executeQuery("SELECT * FROM datatypes");
@@ -73,4 +76,40 @@ public final class DatatypesTest {
 		Assert.assertEquals(new BigDecimal("123456789123456789"), resultSet.getBigDecimal(4));
 	}
 
+	@Test
+	public void testDateByName() throws SQLException {
+		Locale.setDefault(Locale.ENGLISH);
+		Date date = resultSet.getDate("date_column");
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+
+		Assert.assertEquals(17, calendar.get(Calendar.DAY_OF_MONTH));
+		Assert.assertEquals(Calendar.MAY, calendar.get(Calendar.MONTH));
+		Assert.assertEquals(2012, calendar.get(Calendar.YEAR));
+	}
+
+	@Test
+	public void testDateByIndex() throws SQLException {
+		Locale.setDefault(Locale.ENGLISH);
+		Date date = resultSet.getDate(5);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+
+		Assert.assertEquals(17, calendar.get(Calendar.DAY_OF_MONTH));
+		Assert.assertEquals(Calendar.MAY, calendar.get(Calendar.MONTH));
+		Assert.assertEquals(2012, calendar.get(Calendar.YEAR));
+	}
+
+	@Test(expected = SQLException.class)
+	public void testDateInvalidByName() throws SQLException {
+		Locale.setDefault(Locale.ENGLISH);
+		resultSet.getDate("date_column_invalid");
+
+	}
+
+	@Test(expected = SQLException.class)
+	public void testDateInvalidByIndex() throws SQLException {
+		Locale.setDefault(Locale.ENGLISH);
+		resultSet.getDate(6);
+	}
 }

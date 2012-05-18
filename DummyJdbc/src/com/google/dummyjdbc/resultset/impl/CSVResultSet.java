@@ -124,10 +124,21 @@ public class CSVResultSet extends DummyResultSet {
 	}
 
 	@Override
+	public Date getDate(int columnIndex) throws SQLException {
+		String string = getValueForColumnIndex(columnIndex);
+
+		return parseDate(string);
+	}
+
+	@Override
 	public Date getDate(String columnLabel) throws SQLException {
-		DateFormat sdf = THREAD_LOCAL_DATEFORMAT.get();
 		String string = getValueForColumnLabel(columnLabel);
 
+		return parseDate(string);
+	}
+
+	private Date parseDate(String string) throws SQLException {
+		DateFormat sdf = THREAD_LOCAL_DATEFORMAT.get();
 		Date date = null;
 		try {
 			java.util.Date utilDate = sdf.parse(string);
@@ -136,7 +147,7 @@ public class CSVResultSet extends DummyResultSet {
 		} catch (ParseException e) {
 			String message = MessageFormat
 					.format("Could not parse date: {0} using format ''{1}''", string, DATE_FORMAT);
-			System.err.println(message);
+			throw new SQLException(message, e);
 		}
 		return date;
 	}
