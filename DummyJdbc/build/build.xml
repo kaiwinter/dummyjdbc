@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="compile" name="dummyjdbc">
 
-	<property name="version" value="1.0"/>
+	<property name="version" value="1.1"/>
 	
 	<property name="lib.dir" location="../lib" />
 
