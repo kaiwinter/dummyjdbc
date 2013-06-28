@@ -26,11 +26,11 @@ You get the following output from Maven:
 [INFO] -------------------------------------------------------------
 [ERROR] COMPILATION ERROR : 
 [INFO] -------------------------------------------------------------
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/statement/PreparedStatementAdapter.java:[31,8] com.google.dummyjdbc.statement.PreparedStatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/statement/StatementAdapter.java:[14,8] com.google.dummyjdbc.statement.StatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/resultset/DummyResultSet.java:[30,8] com.google.dummyjdbc.resultset.DummyResultSet is not abstract and does not override abstract method <T>getObject(java.lang.String,java.lang.Class<T>) in java.sql.ResultSet
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/connection/ConnectionAdapter.java:[26,8] com.google.dummyjdbc.connection.ConnectionAdapter is not abstract and does not override abstract method getNetworkTimeout() in java.sql.Connection
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/DummyJdbcDriver.java:[21,14] com.google.dummyjdbc.DummyJdbcDriver is not abstract and does not override abstract method getParentLogger() in java.sql.Driver
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/statement/PreparedStatementAdapter.java:[31,8] com.googlecode.dummyjdbc.statement.PreparedStatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/statement/StatementAdapter.java:[14,8] com.googlecode.dummyjdbc.statement.StatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/resultset/DummyResultSet.java:[30,8] com.googlecode.dummyjdbc.resultset.DummyResultSet is not abstract and does not override abstract method <T>getObject(java.lang.String,java.lang.Class<T>) in java.sql.ResultSet
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/connection/ConnectionAdapter.java:[26,8] com.googlecode.dummyjdbc.connection.ConnectionAdapter is not abstract and does not override abstract method getNetworkTimeout() in java.sql.Connection
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/DummyJdbcDriver.java:[21,14] com.googlecode.dummyjdbc.DummyJdbcDriver is not abstract and does not override abstract method getParentLogger() in java.sql.Driver
 [INFO] 5 errors 
 [INFO] -------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
@@ -41,11 +41,11 @@ You get the following output from Maven:
 [INFO] Final Memory: 10M/67M
 [INFO] ------------------------------------------------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project dummyjdbc: Compilation failure: Compilation failure:
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/statement/PreparedStatementAdapter.java:[31,8] com.google.dummyjdbc.statement.PreparedStatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/statement/StatementAdapter.java:[14,8] com.google.dummyjdbc.statement.StatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/resultset/DummyResultSet.java:[30,8] com.google.dummyjdbc.resultset.DummyResultSet is not abstract and does not override abstract method <T>getObject(java.lang.String,java.lang.Class<T>) in java.sql.ResultSet
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/connection/ConnectionAdapter.java:[26,8] com.google.dummyjdbc.connection.ConnectionAdapter is not abstract and does not override abstract method getNetworkTimeout() in java.sql.Connection
-[ERROR] /C:/e4/DummyJdbc/src/main/java/com/google/dummyjdbc/DummyJdbcDriver.java:[21,14] com.google.dummyjdbc.DummyJdbcDriver is not abstract and does not override abstract method getParentLogger() in java.sql.Driver
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/statement/PreparedStatementAdapter.java:[31,8] com.googlecode.dummyjdbc.statement.PreparedStatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/statement/StatementAdapter.java:[14,8] com.googlecode.dummyjdbc.statement.StatementAdapter is not abstract and does not override abstract method isCloseOnCompletion() in java.sql.Statement
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/resultset/DummyResultSet.java:[30,8] com.googlecode.dummyjdbc.resultset.DummyResultSet is not abstract and does not override abstract method <T>getObject(java.lang.String,java.lang.Class<T>) in java.sql.ResultSet
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/connection/ConnectionAdapter.java:[26,8] com.googlecode.dummyjdbc.connection.ConnectionAdapter is not abstract and does not override abstract method getNetworkTimeout() in java.sql.Connection
+[ERROR] /C:/e4/DummyJdbc/src/main/java/com/googlecode/dummyjdbc/DummyJdbcDriver.java:[21,14] com.googlecode.dummyjdbc.DummyJdbcDriver is not abstract and does not override abstract method getParentLogger() in java.sql.Driver
 [ERROR] -> [Help 1]
 [ERROR] 
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
