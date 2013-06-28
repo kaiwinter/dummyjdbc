@@ -1,4 +1,4 @@
-package com.google.dummyjdbc.statement.impl;
+package com.googlecode.dummyjdbc.statement.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,9 +19,9 @@ import java.util.regex.Pattern;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-import com.google.dummyjdbc.resultset.DummyResultSet;
-import com.google.dummyjdbc.resultset.impl.CSVResultSet;
-import com.google.dummyjdbc.statement.StatementAdapter;
+import com.googlecode.dummyjdbc.resultset.DummyResultSet;
+import com.googlecode.dummyjdbc.resultset.impl.CSVResultSet;
+import com.googlecode.dummyjdbc.statement.StatementAdapter;
 
 /**
  * This class does the actual work of the Generic... classes. It tries to open a

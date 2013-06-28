@@ -1,4 +1,4 @@
-package com.google.dummyjdbc.resultset.impl;
+package com.googlecode.dummyjdbc.resultset.impl;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import com.google.dummyjdbc.resultset.DummyResultSet;
+import com.googlecode.dummyjdbc.resultset.DummyResultSet;
 
 /**
  * The {@link CSVResultSet} which iterates over the CSV file data.

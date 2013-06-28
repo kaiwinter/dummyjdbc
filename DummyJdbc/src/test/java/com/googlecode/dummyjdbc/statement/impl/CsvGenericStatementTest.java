@@ -1,4 +1,4 @@
-package com.google.dummyjdbc.statement.impl;
+package com.googlecode.dummyjdbc.statement.impl;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -13,7 +13,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.dummyjdbc.DummyJdbcDriver;
+import com.googlecode.dummyjdbc.DummyJdbcDriver;
+import com.googlecode.dummyjdbc.statement.impl.CsvStatement;
 
 public final class CsvGenericStatementTest {
 

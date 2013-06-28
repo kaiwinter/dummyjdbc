@@ -1,4 +1,4 @@
-package com.google.dummyjdbc.connection;
+package com.googlecode.dummyjdbc.connection;
 
 import java.sql.Array;
 import java.sql.Blob;

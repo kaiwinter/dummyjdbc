@@ -1,4 +1,4 @@
-package com.google.dummyjdbc.connection.impl;
+package com.googlecode.dummyjdbc.connection.impl;
 
 import java.io.File;
 import java.sql.PreparedStatement;
@@ -6,9 +6,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import com.google.dummyjdbc.connection.ConnectionAdapter;
-import com.google.dummyjdbc.statement.impl.CsvPreparedStatement;
-import com.google.dummyjdbc.statement.impl.CsvStatement;
+import com.googlecode.dummyjdbc.connection.ConnectionAdapter;
+import com.googlecode.dummyjdbc.statement.impl.CsvPreparedStatement;
+import com.googlecode.dummyjdbc.statement.impl.CsvStatement;
 
 /**
  * Connection which implements the methods {@link #createStatement()} and {@link #prepareStatement(String)}. The
