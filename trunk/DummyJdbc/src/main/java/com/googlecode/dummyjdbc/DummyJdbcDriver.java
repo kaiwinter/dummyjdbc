@@ -1,4 +1,4 @@
-package com.google.dummyjdbc;
+package com.googlecode.dummyjdbc;
 
 import java.io.File;
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.google.dummyjdbc.connection.impl.DummyConnection;
+import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
 
 /**
  * The {@link DummyJdbcDriver}. The {@link #connect(String, Properties)} method returns the {@link DummyConnection}.

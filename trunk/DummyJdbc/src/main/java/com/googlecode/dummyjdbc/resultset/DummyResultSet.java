@@ -1,4 +1,4 @@
-package com.google.dummyjdbc.resultset;
+package com.googlecode.dummyjdbc.resultset;
 
 import java.io.InputStream;
 import java.io.Reader;

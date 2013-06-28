@@ -1,4 +1,4 @@
-package com.google.dummyjdbc;
+package com.googlecode.dummyjdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +8,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.google.dummyjdbc.connection.impl.DummyConnection;
+import com.googlecode.dummyjdbc.DummyJdbcDriver;
+import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
 
 public final class DummyJdbcDriverTest {
 

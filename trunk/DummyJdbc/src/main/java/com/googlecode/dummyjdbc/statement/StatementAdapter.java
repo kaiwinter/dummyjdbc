@@ -1,4 +1,4 @@
-package com.google.dummyjdbc.statement;
+package com.googlecode.dummyjdbc.statement;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
