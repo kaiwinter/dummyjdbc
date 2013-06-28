@@ -2,6 +2,7 @@
 #labels Featured,Phase-Deploy
 
 = Building using Maven =
+*To build DummyJDBC you have to use Java 6 because in Java 7 new methods were introduced in {{{java.sql}}} which DummyJDBC doesn't override.*
 
 To create a jar which only contains the DummyJDBC classes call:
 {{{
