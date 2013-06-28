@@ -1,0 +1,14 @@
+#summary How to use Maven to create a distributable jar.
+#labels Featured,Phase-Deploy
+
+= Building using Maven =
+
+To create a jar which only contains the DummyJDBC classes call:
+{{{
+mvn package
+}}}
+
+To create a jar which additionally contains the dependencies (OpenCSV, AspectJ) call
+{{{
+mvn package assembly:single
+}}}
