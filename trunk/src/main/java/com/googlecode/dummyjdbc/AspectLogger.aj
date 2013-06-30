@@ -1,4 +1,4 @@
-package com.google.dummyjdbc;
+package com.googlecode.dummyjdbc;
 
 import java.text.MessageFormat;
 
@@ -25,7 +25,7 @@ public aspect AspectLogger {
 	static private void printParameters(JoinPoint jp) {
 		Object[] args = jp.getArgs();
 		String[] names = ((CodeSignature) jp.getSignature()).getParameterNames();
-		Class[] types = ((CodeSignature) jp.getSignature()).getParameterTypes();
+		Class<?>[] types = ((CodeSignature) jp.getSignature()).getParameterTypes();
 		for (int i = 0; i < args.length; i++) {
 			System.err.println(MessageFormat.format("   {0}: {1} = {2}", names[i], types[i].getName(), args[i]));
 		}
