@@ -4,13 +4,36 @@
 	<groupId>com.googlecode.dummyjdbc</groupId>
 	<artifactId>dummyjdbc</artifactId>
 	<version>1.1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
 	<name>DummyJDBC</name>
+	<description>
+		DummyJDBC is a mock JDBC driver which can return data from CSV files 
+	</description>
 	<url>http://code.google.com/p/dummyjdbc/</url>
-	<organization>
-		<name>Kai Winter</name>
-	</organization>
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>http://dummyjdbc.googlecode.com/svn/trunk/</url>
+		<connection>scm:svn:http://dummyjdbc.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://dummyjdbc.googlecode.com/svn/trunk/</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>kai</id>
+			<name>Kai Winter</name>
+		</developer>
+	</developers>
+
 	<issueManagement>
+		<system>Google Code Issues</system>
 		<url>http://code.google.com/p/dummyjdbc/issues/list</url>
 	</issueManagement>
 
@@ -19,7 +42,6 @@
 	</properties>
 
 	<build>
-
 		<plugins>
 
 			<plugin>
@@ -104,4 +126,16 @@
 		</dependency>
 	</dependencies>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 </project>
