@@ -1,0 +1,2 @@
+string_column, 	int_column,	boolean_column,	bigdecimal_column,	date_column,	date_column_invalid
+string_value, 	17, 		true, 			123456789123456789,	17-MAY-12,		17.05.2012
