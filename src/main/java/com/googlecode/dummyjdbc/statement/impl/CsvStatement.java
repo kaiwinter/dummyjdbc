@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -79,7 +80,13 @@ public final class CsvStatement extends StatementAdapter {
 
 			String path = src.getLocation().getPath();
 			path = path.substring(0, path.lastIndexOf("/"));
-			ressource = new File(new File(path), "/tables/" + tableName.toLowerCase() + ".csv");
+			try {
+				ressource = new File(CsvStatement.class.getResource("/tables/" + tableName.toLowerCase() + ".csv")
+						.toURI());
+			} catch (URISyntaxException e) {
+				String message = MessageFormat.format("Error creating URI for table file: {0}", e.getMessage());
+				System.err.println(message);
+			}
 		}
 
 		FileInputStream dummyTableDataStream = null;
