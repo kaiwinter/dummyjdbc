@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.CodeSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -73,16 +74,23 @@ public final class CsvStatement extends StatementAdapter {
 
 	private ResultSet createResultSet(String tableName) {
 		// Does a text file for the dummy table exist?
-		File ressource = tableResources.get(tableName.toLowerCase());
-		if (ressource == null) {
+		File resource = tableResources.get(tableName.toLowerCase());
+		if (resource == null) {
 			// Try to load a file from the ./tables/ directory
 			CodeSource src = CsvStatement.class.getProtectionDomain().getCodeSource();
 
 			String path = src.getLocation().getPath();
 			path = path.substring(0, path.lastIndexOf("/"));
 			try {
-				ressource = new File(CsvStatement.class.getResource("/tables/" + tableName.toLowerCase() + ".csv")
-						.toURI());
+				URL url = CsvStatement.class.getResource("/tables/" + tableName.toLowerCase() + ".csv");
+				if (url == null) {
+					String message = MessageFormat.format(
+							"No table definition found for ''{0}'', using DummyResultSet.", tableName);
+					System.err.println(message);
+					return new DummyResultSet();
+				} else {
+					resource = new File(url.toURI());
+				}
 			} catch (URISyntaxException e) {
 				String message = MessageFormat.format("Error creating URI for table file: {0}", e.getMessage());
 				System.err.println(message);
@@ -91,7 +99,7 @@ public final class CsvStatement extends StatementAdapter {
 
 		FileInputStream dummyTableDataStream = null;
 		try {
-			dummyTableDataStream = new FileInputStream(ressource);
+			dummyTableDataStream = new FileInputStream(resource);
 			return createGenericResultSet(tableName, dummyTableDataStream);
 		} catch (FileNotFoundException e) {
 			String message = MessageFormat.format("No table definition found for ''{0}'', using DummyResultSet.",
