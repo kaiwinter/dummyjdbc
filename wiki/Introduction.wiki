@@ -5,6 +5,7 @@
 ==Features==
    * Ignoring JDBC queries and returning an empty {{{ResultSet}}} for any query 
    * Returning values which are parsed from CSV files as {{{ResultSet}}}
+   * SQL queries and stored procedures are supported
 
 
 == Usage ==
