@@ -26,8 +26,8 @@ import com.googlecode.dummyjdbc.resultset.impl.CSVResultSet;
 import com.googlecode.dummyjdbc.statement.StatementAdapter;
 
 /**
- * This class does the actual work of the Generic... classes. It tries to open a
- * CSV file for the table name in the query and parses the contained data.
+ * This class does the actual work of the Generic... classes. It tries to open a CSV file for the table name in the
+ * query and parses the contained data.
  * 
  * @author Kai Winter
  */
@@ -157,7 +157,7 @@ public final class CsvStatement extends StatementAdapter {
 
 				}
 			}
-			return new CSVResultSet(entries);
+			return new CSVResultSet(tableName, entries);
 
 		} catch (IOException e) {
 			e.printStackTrace();

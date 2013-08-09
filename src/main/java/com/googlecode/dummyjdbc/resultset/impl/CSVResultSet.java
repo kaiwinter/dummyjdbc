@@ -41,13 +41,19 @@ public class CSVResultSet extends DummyResultSet {
 	/** The current value of the iterator. */
 	private LinkedHashMap<String, String> currentEntry;
 
+	private final String tableName;
+
 	/**
 	 * Constructs a new {@link CSVResultSet}.
-	 *
+	 * 
+	 * @param tableName
+	 *            the name of the table this {@link CSVResultSet} stands for.
+	 * 
 	 * @param entries
 	 *            Collection of entries from the CSV file. Each {@link LinkedHashMap} maps column name to column value.
 	 */
-	public CSVResultSet(Collection<LinkedHashMap<String, String>> entries) {
+	public CSVResultSet(String tableName, Collection<LinkedHashMap<String, String>> entries) {
+		this.tableName = tableName;
 		this.dummyData = entries;
 		this.resultIterator = dummyData.iterator();
 	}
@@ -145,8 +151,8 @@ public class CSVResultSet extends DummyResultSet {
 			date = new Date(utilDate.getTime());
 
 		} catch (ParseException e) {
-			String message = MessageFormat
-					.format("Could not parse date: {0} using format ''{1}''", string, DATE_FORMAT);
+			String message = MessageFormat.format("Could not parse date: ''{0}'' using format ''{1}''", string,
+					DATE_FORMAT);
 			throw new SQLException(message, e);
 		}
 		return date;
@@ -156,7 +162,9 @@ public class CSVResultSet extends DummyResultSet {
 		String[] columns = currentEntry.keySet().toArray(new String[0]);
 
 		if (columnIndex > columns.length) {
-			throw new SQLException("Column " + columnIndex + " does not exist.");
+			String message = MessageFormat.format("Column index {0} does not exist in table file ''{1}''", columnIndex,
+					tableName);
+			throw new SQLException(message);
 		}
 
 		String key = columns[columnIndex - 1];
@@ -166,7 +174,9 @@ public class CSVResultSet extends DummyResultSet {
 
 	private String getValueForColumnLabel(String columnLabel) throws SQLException {
 		if (!currentEntry.containsKey(columnLabel.toUpperCase())) {
-			throw new SQLException(MessageFormat.format("Column {0} does not exist.", columnLabel));
+			String message = MessageFormat.format("Column ''{0}'' does not exist in table file ''{1}''", columnLabel,
+					tableName);
+			throw new SQLException(message);
 		}
 
 		return currentEntry.get(columnLabel.toUpperCase());
