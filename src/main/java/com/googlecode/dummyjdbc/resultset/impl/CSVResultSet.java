@@ -70,28 +70,28 @@ public class CSVResultSet extends DummyResultSet {
 
 	@Override
 	public String getString(int columnIndex) throws SQLException {
-		String value = getValueForColumnIndex(columnIndex);
+		String value = getValueForColumnIndex(columnIndex, String.class);
 
 		return value;
 	}
 
 	@Override
 	public boolean getBoolean(int columnIndex) throws SQLException {
-		String value = getValueForColumnIndex(columnIndex);
+		String value = getValueForColumnIndex(columnIndex, Boolean.class);
 
 		return Boolean.valueOf(value);
 	}
 
 	@Override
 	public int getInt(int columnIndex) throws SQLException {
-		String value = getValueForColumnIndex(columnIndex);
+		String value = getValueForColumnIndex(columnIndex, Integer.class);
 
 		return Integer.valueOf(value);
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-		String value = getValueForColumnIndex(columnIndex);
+		String value = getValueForColumnIndex(columnIndex, BigDecimal.class);
 
 		if (value.isEmpty()) {
 			return BigDecimal.valueOf(0);
@@ -101,7 +101,7 @@ public class CSVResultSet extends DummyResultSet {
 
 	@Override
 	public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-		String string = getValueForColumnLabel(columnLabel);
+		String string = getValueForColumnLabel(columnLabel, BigDecimal.class);
 
 		if (string.isEmpty()) {
 			return BigDecimal.valueOf(0);
@@ -111,34 +111,34 @@ public class CSVResultSet extends DummyResultSet {
 
 	@Override
 	public String getString(String columnLabel) throws SQLException {
-		String string = getValueForColumnLabel(columnLabel);
+		String string = getValueForColumnLabel(columnLabel, String.class);
 		return string;
 	}
 
 	@Override
 	public boolean getBoolean(String columnLabel) throws SQLException {
-		String string = getValueForColumnLabel(columnLabel);
+		String string = getValueForColumnLabel(columnLabel, Boolean.class);
 
 		return Boolean.valueOf(string);
 	}
 
 	@Override
 	public int getInt(String columnLabel) throws SQLException {
-		String string = getValueForColumnLabel(columnLabel);
+		String string = getValueForColumnLabel(columnLabel, Integer.class);
 
 		return Integer.valueOf(string);
 	}
 
 	@Override
 	public Date getDate(int columnIndex) throws SQLException {
-		String string = getValueForColumnIndex(columnIndex);
+		String string = getValueForColumnIndex(columnIndex, Date.class);
 
 		return parseDate(string);
 	}
 
 	@Override
 	public Date getDate(String columnLabel) throws SQLException {
-		String string = getValueForColumnLabel(columnLabel);
+		String string = getValueForColumnLabel(columnLabel, Date.class);
 
 		return parseDate(string);
 	}
@@ -158,12 +158,13 @@ public class CSVResultSet extends DummyResultSet {
 		return date;
 	}
 
-	private String getValueForColumnIndex(int columnIndex) throws SQLException {
+	private String getValueForColumnIndex(int columnIndex, Class<?> clazz) throws SQLException {
 		String[] columns = currentEntry.keySet().toArray(new String[0]);
 
 		if (columnIndex > columns.length) {
-			String message = MessageFormat.format("Column index {0} does not exist in table file ''{1}''", columnIndex,
-					tableName);
+			String message = MessageFormat.format(
+					"Column index {0} does not exist in table file ''{1}'' (type ''{2}'')", columnIndex, tableName,
+					clazz);
 			throw new SQLException(message);
 		}
 
@@ -172,10 +173,10 @@ public class CSVResultSet extends DummyResultSet {
 		return value;
 	}
 
-	private String getValueForColumnLabel(String columnLabel) throws SQLException {
+	private String getValueForColumnLabel(String columnLabel, Class<?> clazz) throws SQLException {
 		if (!currentEntry.containsKey(columnLabel.toUpperCase())) {
-			String message = MessageFormat.format("Column ''{0}'' does not exist in table file ''{1}''", columnLabel,
-					tableName);
+			String message = MessageFormat.format("Column ''{0}'' does not exist in table file ''{1}'' (type ''{2}'')",
+					columnLabel, tableName, clazz);
 			throw new SQLException(message);
 		}
 
