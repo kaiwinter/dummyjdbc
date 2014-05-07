@@ -83,7 +83,7 @@ public class ConnectionAdapter implements Connection {
 
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
-		return null;
+		return new DummyDatabaseMetaData();
 	}
 
 	@Override
