@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import au.com.bytecode.opencsv.CSVReader;
 
 import com.googlecode.dummyjdbc.resultset.DummyResultSet;
@@ -32,6 +35,8 @@ import com.googlecode.dummyjdbc.statement.StatementAdapter;
  * @author Kai Winter
  */
 public final class CsvStatement extends StatementAdapter {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CsvStatement.class);
 
 	/** Pattern to get table name from an SQL statement. */
 	private static final Pattern TABLENAME_PATTERN = Pattern.compile(".*from (\\S*)\\s?.*", Pattern.CASE_INSENSITIVE);
@@ -84,16 +89,13 @@ public final class CsvStatement extends StatementAdapter {
 			try {
 				URL url = CsvStatement.class.getResource("/tables/" + tableName.toLowerCase() + ".csv");
 				if (url == null) {
-					String message = MessageFormat.format(
-							"No table definition found for ''{0}'', using DummyResultSet.", tableName);
-					System.err.println(message);
+					LOGGER.info("No table definition found for '{}', using DummyResultSet.", tableName);
 					return new DummyResultSet();
 				} else {
 					resource = new File(url.toURI());
 				}
 			} catch (URISyntaxException e) {
-				String message = MessageFormat.format("Error creating URI for table file: {0}", e.getMessage());
-				System.err.println(message);
+				LOGGER.error("Error creating URI for table file: {}", e.getMessage(), e);
 			}
 		}
 
@@ -102,18 +104,13 @@ public final class CsvStatement extends StatementAdapter {
 			dummyTableDataStream = new FileInputStream(resource);
 			return createGenericResultSet(tableName, dummyTableDataStream);
 		} catch (FileNotFoundException e) {
-			String message = MessageFormat.format("No table definition found for ''{0}'', using DummyResultSet.",
-					tableName);
-			System.err.println(message);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			LOGGER.info("No table definition found for '{}', using DummyResultSet.", tableName);
 		} finally {
 			if (dummyTableDataStream != null) {
 				try {
 					dummyTableDataStream.close();
 				} catch (IOException e) {
 					// ignore
-					e.printStackTrace();
 				}
 			}
 		}
@@ -121,8 +118,7 @@ public final class CsvStatement extends StatementAdapter {
 		return new DummyResultSet();
 	}
 
-	private ResultSet createGenericResultSet(String tableName, InputStream dummyTableDataStream)
-			throws IllegalAccessException {
+	private ResultSet createGenericResultSet(String tableName, InputStream dummyTableDataStream) {
 
 		// Maps table columns to a number of available values.
 		Collection<LinkedHashMap<String, String>> entries = new ArrayList<LinkedHashMap<String, String>>();
@@ -145,7 +141,7 @@ public final class CsvStatement extends StatementAdapter {
 							if (map.containsKey(header[i].trim().toUpperCase())) {
 								String message = MessageFormat.format("Duplicate column in file ''{0}.txt: {1}",
 										tableName, header[i]);
-								throw new IllegalAccessException(message);
+								throw new IllegalArgumentException(message);
 							}
 							map.put(header[i].trim().toUpperCase(), data[i].trim());
 
@@ -160,14 +156,13 @@ public final class CsvStatement extends StatementAdapter {
 			return new CSVResultSet(tableName, entries);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("Error while reading data from CSV", e);
 		} finally {
 			if (dummyTableReader != null) {
 				try {
 					dummyTableReader.close();
 				} catch (IOException e) {
 					// ignore
-					e.printStackTrace();
 				}
 			}
 		}

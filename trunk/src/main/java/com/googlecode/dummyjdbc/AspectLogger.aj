@@ -1,10 +1,10 @@
 package com.googlecode.dummyjdbc;
 
-import java.text.MessageFormat;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.CodeSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public aspect AspectLogger {
 
@@ -13,21 +13,21 @@ public aspect AspectLogger {
 	before(): traceMethods() {
 		Signature sig = thisJoinPointStaticPart.getSignature();
 
-		String message = "Call " + sig.getDeclaringTypeName() + "." + sig.getName() + ": ";
-		System.err.println(message);
-		printParameters(thisJoinPoint);
+		Logger logger = LoggerFactory.getLogger(thisJoinPoint.getTarget().getClass());
+		logger.trace("Call {}.{}: ", sig.getDeclaringTypeName(), sig.getName());
+		printParameters(logger, thisJoinPoint);
 	}
 
 	after() returning(Object o) : traceMethods() {
-		System.err.println("   -> Returning: " + o);
+		LoggerFactory.getLogger(thisJoinPoint.getTarget().getClass()).trace("   -> Returning: {}", o);
 	}
 
-	static private void printParameters(JoinPoint jp) {
+	static private void printParameters(Logger logger, JoinPoint jp) {
 		Object[] args = jp.getArgs();
 		String[] names = ((CodeSignature) jp.getSignature()).getParameterNames();
 		Class<?>[] types = ((CodeSignature) jp.getSignature()).getParameterTypes();
 		for (int i = 0; i < args.length; i++) {
-			System.err.println(MessageFormat.format("   {0}: {1} = {2}", names[i], types[i].getName(), args[i]));
+			logger.trace("   {}: {} = {}", names[i], types[i].getName(), args[i]);
 		}
 	}
 }
