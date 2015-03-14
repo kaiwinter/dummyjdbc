@@ -702,4 +702,15 @@ public class DummyDatabaseMetaData implements DatabaseMetaData {
     @Override public boolean isWrapperFor(Class<?> aClass) throws SQLException {
         return false;
     }
+
+	@Override
+	public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern)
+			throws SQLException {
+		return null;
+	}
+
+	@Override
+	public boolean generatedKeyAlwaysReturned() throws SQLException {
+		return false;
+	}
 }

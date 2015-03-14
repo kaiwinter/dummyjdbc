@@ -6,10 +6,12 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
 
@@ -72,5 +74,10 @@ public final class DummyJdbcDriver implements Driver {
 	@Override
 	public DriverPropertyInfo[] getPropertyInfo(final String url, final Properties props) throws SQLException {
 		return new DriverPropertyInfo[0];
+	}
+
+	@Override
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		return null;
 	}
 }

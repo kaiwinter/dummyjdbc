@@ -209,4 +209,13 @@ public class StatementAdapter implements Statement {
 	public ResultSet executeQuery(String sql) throws SQLException {
 		return null;
 	}
+
+	@Override
+	public void closeOnCompletion() throws SQLException {
+	}
+
+	@Override
+	public boolean isCloseOnCompletion() throws SQLException {
+		return false;
+	}
 }
