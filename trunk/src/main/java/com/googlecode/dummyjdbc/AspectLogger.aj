@@ -11,15 +11,23 @@ public aspect AspectLogger {
 	pointcut traceMethods() : (execution(public * *(..))&& !cflow(within(AspectLogger)));
 
 	before(): traceMethods() {
-		Signature sig = thisJoinPointStaticPart.getSignature();
-
-		Logger logger = LoggerFactory.getLogger(thisJoinPoint.getTarget().getClass());
-		logger.trace("Call {}.{}: ", sig.getDeclaringTypeName(), sig.getName());
+		Signature signature = thisJoinPointStaticPart.getSignature();
+		Object target = thisJoinPoint.getTarget();
+		if (target == null) {
+			target = signature.getDeclaringType();
+		}
+		
+		Logger logger = LoggerFactory.getLogger(target.getClass());
+		logger.trace("Call {}.{}: ", signature.getDeclaringTypeName(), signature.getName());
 		printParameters(logger, thisJoinPoint);
 	}
 
 	after() returning(Object o) : traceMethods() {
-		LoggerFactory.getLogger(thisJoinPoint.getTarget().getClass()).trace("   -> Returning: {}", o);
+		Object target = thisJoinPoint.getTarget();
+		if (target == null) {
+			target = thisJoinPointStaticPart.getSignature().getDeclaringType();
+		}
+		LoggerFactory.getLogger(target.getClass()).trace("   -> Returning: {}", o);
 	}
 
 	static private void printParameters(Logger logger, JoinPoint jp) {
