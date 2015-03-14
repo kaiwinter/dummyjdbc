@@ -17,6 +17,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 /**
  * Empty implementation of {@link Connection}. Sub classes should implement the functionality.
@@ -128,8 +129,7 @@ public class ConnectionAdapter implements Connection {
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-			throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
 		return null;
 	}
 
@@ -175,20 +175,19 @@ public class ConnectionAdapter implements Connection {
 	}
 
 	@Override
-	public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+	public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+		return null;
+	}
+
+	@Override
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
 			throws SQLException {
 		return null;
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
-			int resultSetHoldability) throws SQLException {
-		return null;
-	}
-
-	@Override
-	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-			int resultSetHoldability) throws SQLException {
+	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+			throws SQLException {
 		return null;
 	}
 
@@ -258,5 +257,27 @@ public class ConnectionAdapter implements Connection {
 	@Override
 	public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
 		return null;
+	}
+
+	@Override
+	public void setSchema(String schema) throws SQLException {
+	}
+
+	@Override
+	public String getSchema() throws SQLException {
+		return null;
+	}
+
+	@Override
+	public void abort(Executor executor) throws SQLException {
+	}
+
+	@Override
+	public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+	}
+
+	@Override
+	public int getNetworkTimeout() throws SQLException {
+		return 0;
 	}
 }

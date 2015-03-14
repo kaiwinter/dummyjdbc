@@ -460,4 +460,12 @@ public class PreparedStatementAdapter implements PreparedStatement {
 		return null;
 	}
 
+	@Override
+	public void closeOnCompletion() throws SQLException {
+	}
+
+	@Override
+	public boolean isCloseOnCompletion() throws SQLException {
+		return false;
+	}
 }
