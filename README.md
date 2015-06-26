@@ -1,4 +1,4 @@
-# dummyjdbc
+# dummyjdbc [![Build Status](https://drone.io/github.com/kaiwinter/dummyjdbc/status.png)](https://drone.io/github.com/kaiwinter/dummyjdbc/latest)
 
 dummyjdbc answers database requests of any application with dummy data to be independent of an existing database.
 
