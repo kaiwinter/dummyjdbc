@@ -7,11 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
- * Created with IntelliJ IDEA.
+ * Implementation of {@link ResultSetMetaData} which returns default values.
  *
- * @author xuqiang
- * @date 2018/02/28
- * @description
+ * @author WhatAKitty
  **/
 public class DummyResultSetMetaData implements ResultSetMetaData {
 
