@@ -1,6 +1,10 @@
 package com.googlecode.dummyjdbc;
 
+import com.googlecode.dummyjdbc.utils.FilenameUtils;
+import com.googlecode.dummyjdbc.utils.StringUtils;
 import java.io.File;
+import java.io.FileFilter;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -22,7 +26,9 @@ import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
  */
 public final class DummyJdbcDriver implements Driver {
 
-	private static Map<String, File> tableResources = Collections.synchronizedMap(new HashMap<String, File>());
+	private final static String DEFAULT_DATABASE = "any";
+
+	private static Map<String, Map<String, File>> tableResources = Collections.synchronizedMap(new HashMap<String, Map<String, File>>());
 
 	static {
 		try {
@@ -43,7 +49,9 @@ public final class DummyJdbcDriver implements Driver {
 	 *            A {@link File} object of a CSV file which should be parsed in order to return table data.
 	 */
 	public static void addTableResource(String tablename, File csvFile) {
-		tableResources.put(tablename, csvFile);
+		Map<String, File> databaseMap = Collections.synchronizedMap(new HashMap<String, File>());
+		databaseMap.put(tablename, csvFile);
+		tableResources.put(DEFAULT_DATABASE, databaseMap);
 	}
 
 	@Override
@@ -68,7 +76,11 @@ public final class DummyJdbcDriver implements Driver {
 
 	@Override
 	public Connection connect(String url, Properties info) throws SQLException {
-		return new DummyConnection(tableResources);
+		String database = parseConnectUrl(url);
+
+		loadTableResources(database);
+
+		return new DummyConnection(tableResources.get(database));
 	}
 
 	@Override
@@ -80,4 +92,76 @@ public final class DummyJdbcDriver implements Driver {
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		return null;
 	}
+
+	/**
+	 * Parse jdbc url to database file path
+	 *
+	 * @param url 	jdbc url
+	 * @return database file path
+	 */
+	private String parseConnectUrl(String url) {
+		if (url == null) {
+			throw new RuntimeException("You should defined jdbc url first");
+		}
+
+		final int index = url.indexOf("jdbc::mock::");
+		if (index == -1) {
+			return DEFAULT_DATABASE;
+		}
+
+		final String others = url.substring("jdbc::mock::".length());
+		final String[] items = others.split("::");
+		switch(items.length) {
+			case 0:
+				throw new RuntimeException("No database directory defined");
+			default:
+				return StringUtils.join(items, "/");
+		}
+
+	}
+
+	/**
+	 * load table resources from database directory
+	 *
+	 * @param database database path
+	 */
+	private void loadTableResources(String database) {
+		// ignore database name is any
+		if (DEFAULT_DATABASE.equals(database)) {
+			return;
+		}
+
+		// check database is exists
+		URL dirUrl = getClass().getClassLoader().getResource(database);
+		if (dirUrl == null) {
+			throw new RuntimeException("The database directory is not exists");
+		}
+
+		File dir = new File(dirUrl.getFile());
+		if (!dir.canRead() || !dir.isDirectory()) {
+			throw new RuntimeException("The database directory is not a directory or cannot read");
+		}
+
+		// get all table files
+		File[] files = dir.listFiles(new FileFilter() {
+
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isFile() && FilenameUtils.isExtension(pathname.getName(), "csv");
+			}
+
+		});
+
+		// registry table resources
+		for (File file : files) {
+			Map<String, File> databaseMap = tableResources.get(database);
+			if (databaseMap == null) {
+				databaseMap = Collections.synchronizedMap(new HashMap<String, File>());
+				tableResources.put(database, databaseMap);
+			}
+			databaseMap.put(FilenameUtils.getBaseName(file.getName()), file);
+		}
+	}
+
+
 }
