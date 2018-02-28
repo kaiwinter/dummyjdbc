@@ -27,6 +27,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.googlecode.dummyjdbc.resultset.DummyResultSet;
 import com.googlecode.dummyjdbc.resultset.impl.CSVResultSet;
 import com.googlecode.dummyjdbc.statement.StatementAdapter;
+import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 
 /**
  * This class does the actual work of the Generic... classes. It tries to open a CSV file for the table name in the
@@ -138,12 +139,13 @@ public final class CsvStatement extends StatementAdapter {
 					if (header.length == data.length) {
 						LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 						for (int i = 0; i < header.length; i++) {
-							if (map.containsKey(header[i].trim().toUpperCase())) {
+                            final String headerName = resolveHeaderName(header[i]);
+							if (map.containsKey(headerName)) {
 								String message = MessageFormat.format("Duplicate column in file ''{0}.txt: {1}",
 										tableName, header[i]);
 								throw new IllegalArgumentException(message);
 							}
-							map.put(header[i].trim().toUpperCase(), data[i].trim());
+							map.put(headerName, data[i].trim());
 
 						}
 						entries.add(map);
@@ -153,7 +155,7 @@ public final class CsvStatement extends StatementAdapter {
 
 				}
 			}
-			return new CSVResultSet(tableName, entries);
+			return new CSVResultSet(tableName, new DummyResultSetMetaData(tableName, header), entries);
 
 		} catch (IOException e) {
 			LOGGER.error("Error while reading data from CSV", e);
@@ -169,4 +171,8 @@ public final class CsvStatement extends StatementAdapter {
 
 		return new DummyResultSet();
 	}
+
+	private String resolveHeaderName(String str) {
+	    return str.trim().toUpperCase();
+    }
 }
