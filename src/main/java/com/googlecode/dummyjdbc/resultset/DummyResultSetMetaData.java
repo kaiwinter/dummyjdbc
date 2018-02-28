@@ -89,13 +89,17 @@ public class DummyResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public int isNullable(int column) throws SQLException {
-        throw new UnsupportedOperationException("isNullable");
+        return 3;
 
     }
 
     @Override
     public boolean isSigned(int column) throws SQLException {
-        throw new UnsupportedOperationException("isSigned");
+        int type = getColumnType(column);
+        if (type == DataType.DOUBLE.sqlType || type == DataType.INTEGER.sqlType) {
+            return true;
+        }
+        return false;
 
     }
 

@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
@@ -35,15 +34,6 @@ public final class DatatypesTest {
 		resultSet = statement.executeQuery("SELECT * FROM datatypes");
 
 		Assert.assertTrue(resultSet.next());
-	}
-
-	@Test
-	public void testMetaData() throws SQLException {
-		ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-		Assert.assertNotNull(resultSetMetaData);
-		Assert.assertEquals(resultSetMetaData.getColumnCount(), 6);
-		Assert.assertEquals(resultSetMetaData.getColumnName(1), "string_column".toUpperCase());
-		Assert.assertEquals(resultSetMetaData.getColumnName(6), "date_column_invalid".toUpperCase());
 	}
 
 	@Test
