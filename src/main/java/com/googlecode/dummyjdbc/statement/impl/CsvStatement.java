@@ -32,11 +32,11 @@ import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 /**
  * This class does the actual work of the Generic... classes. It tries to open a CSV file for the table name in the
  * query and parses the contained data.
- * 
+ *
  * @author Kai Winter
  */
 public final class CsvStatement extends StatementAdapter {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CsvStatement.class);
 
 	/** Pattern to get table name from an SQL statement. */
@@ -46,11 +46,13 @@ public final class CsvStatement extends StatementAdapter {
 	private static final Pattern STORED_PROCEDURE_PATTERN = Pattern.compile(".*(EXEC|EXECUTE) (\\S*)\\s?.*",
 			Pattern.CASE_INSENSITIVE);
 
-	private final Map<String, File> tableResources;
+	private  static  final  Pattern  PURE_SELECT_PATTERN  =  Pattern.compile("select  .*",  Pattern.CASE_INSENSITIVE);
+
+    private final Map<String, File> tableResources;
 
 	/**
 	 * Constructs a new {@link CsvStatement}.
-	 * 
+	 *
 	 * @param tableResources
 	 *            {@link Map} of table name to CSV file.
 	 */
@@ -75,7 +77,13 @@ public final class CsvStatement extends StatementAdapter {
 			return createResultSet(storedProcedureName);
 		}
 
-		return new DummyResultSet();
+        //  Try  to  interpret  SQL  as  a  pure  select
+		Matcher  pureSelectMatcher  =  PURE_SELECT_PATTERN.matcher(sql);
+		if  (pureSelectMatcher.matches())  {
+			return  createPureResultSet();
+		}
+
+        return new DummyResultSet();
 	}
 
 	private ResultSet createResultSet(String tableName) {
@@ -170,6 +178,19 @@ public final class CsvStatement extends StatementAdapter {
 		}
 
 		return new DummyResultSet();
+	}
+
+	private DummyResultSet createPureResultSet() {
+
+        // Maps table columns to a number of available values.
+		Collection<LinkedHashMap<String, String>> entries = new ArrayList<LinkedHashMap<String, String>>();
+
+		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		map.put("1", "1");
+
+		entries.add(map);
+
+		return new CSVResultSet(null, null, entries);
 	}
 
 	private String resolveHeaderName(String str) {
