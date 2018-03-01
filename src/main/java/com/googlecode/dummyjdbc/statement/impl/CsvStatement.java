@@ -46,7 +46,7 @@ public final class CsvStatement extends StatementAdapter {
 	private static final Pattern STORED_PROCEDURE_PATTERN = Pattern.compile(".*(EXEC|EXECUTE) (\\S*)\\s?.*",
 			Pattern.CASE_INSENSITIVE);
 
-	private  static  final  Pattern  PURE_SELECT_PATTERN  =  Pattern.compile("select  .*",  Pattern.CASE_INSENSITIVE);
+	private static final Pattern PURE_SELECT_PATTERN = Pattern.compile("select .*", Pattern.CASE_INSENSITIVE);
 
     private final Map<String, File> tableResources;
 
