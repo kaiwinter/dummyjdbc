@@ -3,6 +3,7 @@ package com.googlecode.dummyjdbc.resultset;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -14,17 +15,19 @@ import java.util.Objects;
 public class DummyResultSetMetaData implements ResultSetMetaData {
 
     private enum DataType {
-        VARCHAR(Types.VARCHAR),
-        INTEGER(Types.INTEGER),
-        DOUBLE(Types.DOUBLE),
-        DATE(Types.DATE),
-        TIME(Types.TIME),
-        TIMESTAMP(Types.TIMESTAMP);
+        VARCHAR(Types.VARCHAR, String.class),
+        INTEGER(Types.INTEGER, Integer.class),
+        DOUBLE(Types.DOUBLE, Double.class),
+        DATE(Types.DATE, Date.class),
+        TIME(Types.TIME, Date.class),
+        TIMESTAMP(Types.TIMESTAMP, Date.class);
 
         private final int sqlType;
+        private final Class<?> clazz;
 
-        DataType(int sqlType) {
+        DataType(int sqlType, Class<?> clazz) {
             this.sqlType = sqlType;
+            this.clazz = clazz;
         }
 
         public static DataType fromString(String spec) {
@@ -71,8 +74,7 @@ public class DummyResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public boolean isCaseSensitive(int column) throws SQLException {
-        throw new UnsupportedOperationException("isCaseSensitive");
-
+        return false;
     }
 
     @Override
@@ -157,14 +159,12 @@ public class DummyResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public boolean isReadOnly(int column) throws SQLException {
-        throw new UnsupportedOperationException("isReadOnly");
-
+        return false;
     }
 
     @Override
     public boolean isWritable(int column) throws SQLException {
-        throw new UnsupportedOperationException("isWritable");
-
+        return true;
     }
 
     @Override
@@ -175,8 +175,7 @@ public class DummyResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public String getColumnClassName(int column) throws SQLException {
-        throw new UnsupportedOperationException("getColumnClassName");
-
+        return columnTypes.get(columnNames[column - 1]).clazz.getName();
     }
 
     @Override
