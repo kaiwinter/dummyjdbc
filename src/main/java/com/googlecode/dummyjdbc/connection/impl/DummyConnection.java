@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.Map;
 
 import com.googlecode.dummyjdbc.connection.ConnectionAdapter;
@@ -27,7 +28,11 @@ public class DummyConnection extends ConnectionAdapter {
 	 * @param tableResources {@link Map} of table name to CSV file.
 	 */
 	public DummyConnection(Map<String, File> tableResources) {
-		this.tableResources = tableResources;
+		if (tableResources == null) {
+			this.tableResources = Collections.emptyMap();
+		} else {
+			this.tableResources = tableResources;
+		}
 	}
 
 	@Override
