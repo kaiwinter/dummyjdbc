@@ -9,7 +9,7 @@
 	<description>
 		DummyJDBC is a mock JDBC driver which can return data from CSV files 
 	</description>
-	<url>http://code.google.com/p/dummyjdbc/</url>
+	<url>https://github.com/kaiwinter/dummyjdbc</url>
 	<licenses>
 		<license>
 			<name>Apache 2</name>
@@ -19,9 +19,9 @@
 	</licenses>
 
 	<scm>
-		<url>http://dummyjdbc.googlecode.com/svn/trunk/</url>
-		<connection>scm:svn:http://dummyjdbc.googlecode.com/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://dummyjdbc.googlecode.com/svn/trunk/</developerConnection>
+		<url>https://github.com/kaiwinter/dummyjdbc</url>
+		<connection>scm:git:https://github.com/kaiwinter/dummyjdbc.git</connection>
+		<developerConnection>scm:git:git@github.com:kaiwinter/dummyjdbc.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -32,8 +32,8 @@
 	</developers>
 
 	<issueManagement>
-		<system>Google Code Issues</system>
-		<url>http://code.google.com/p/dummyjdbc/issues/list</url>
+		<system>GitHub Issues</system>
+		<url>https://github.com/kaiwinter/dummyjdbc/issues</url>
 	</issueManagement>
 
 	<properties>
