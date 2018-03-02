@@ -27,6 +27,18 @@ public final class CsvStatementTest {
 		ResultSet resultSet = statement.executeQuery("SELECT * FROM unknown_table");
 		boolean next = resultSet.next();
 
-		Assert.assertFalse(next);
-	}
+        Assert.assertFalse(next);
+    }
+
+    @Test
+    public void validSql() throws Exception {
+        Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+        Connection connection = DriverManager.getConnection("any");
+        Statement statement = connection.createStatement();
+
+        Assert.assertTrue(statement instanceof CsvStatement);
+        ResultSet resultSet = statement.executeQuery("SELECT 1");
+        boolean next = resultSet.next();
+    }
 }

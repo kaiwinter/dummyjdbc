@@ -2,6 +2,7 @@ package com.googlecode.dummyjdbc.resultset.impl;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -12,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import com.googlecode.dummyjdbc.resultset.DummyResultSet;
+import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 
 /**
  * The {@link CSVResultSet} which iterates over the CSV file data.
@@ -32,6 +34,9 @@ public class CSVResultSet extends DummyResultSet {
 		}
 	};
 
+	/** Table schema */
+    private DummyResultSetMetaData metaData;
+
 	/** Column name 2 column value. */
 	private Collection<LinkedHashMap<String, String>> dummyData;
 
@@ -45,15 +50,19 @@ public class CSVResultSet extends DummyResultSet {
 
 	/**
 	 * Constructs a new {@link CSVResultSet}.
-	 * 
+	 *
 	 * @param tableName
 	 *            the name of the table this {@link CSVResultSet} stands for.
-	 * 
+	 *
+     * @param metaData
+     *            the table schema.
+	 *
 	 * @param entries
 	 *            Collection of entries from the CSV file. Each {@link LinkedHashMap} maps column name to column value.
 	 */
-	public CSVResultSet(String tableName, Collection<LinkedHashMap<String, String>> entries) {
+	public CSVResultSet(String tableName, DummyResultSetMetaData metaData, Collection<LinkedHashMap<String, String>> entries) {
 		this.tableName = tableName;
+		this.metaData = metaData;
 		this.dummyData = entries;
 		this.resultIterator = dummyData.iterator();
 	}
@@ -66,6 +75,11 @@ public class CSVResultSet extends DummyResultSet {
 		}
 
 		return false;
+	}
+
+	@Override
+	public ResultSetMetaData getMetaData() throws SQLException {
+		return this.metaData;
 	}
 
 	@Override

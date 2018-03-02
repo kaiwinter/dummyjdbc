@@ -21,4 +21,14 @@ public final class DummyJdbcDriverTest {
 
 		Assert.assertTrue(connection instanceof DummyConnection);
 	}
+
+	@Test
+	public void testLoadDatabase() throws ClassNotFoundException, SQLException {
+
+		Class.forName(DummyJdbcDriver.class.getCanonicalName());
+		Connection connection = DriverManager.getConnection("jdbc::mock::database");
+
+		Assert.assertTrue(connection instanceof DummyConnection);
+	}
+
 }
