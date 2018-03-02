@@ -1,4 +1,5 @@
-# dummyjdbc [![Build Status](https://drone.io/github.com/kaiwinter/dummyjdbc/status.png)](https://drone.io/github.com/kaiwinter/dummyjdbc/latest)
+# dummyjdbc 
+[![CircleCI](https://circleci.com/gh/kaiwinter/dummyjdbc.svg?style=svg)](https://circleci.com/gh/kaiwinter/dummyjdbc)
 
 dummyjdbc answers database requests of any application with dummy data to be independent of an existing database.
 
