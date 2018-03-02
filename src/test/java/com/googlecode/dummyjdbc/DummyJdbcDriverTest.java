@@ -4,11 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
-import com.googlecode.dummyjdbc.DummyJdbcDriver;
 import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
 
 public final class DummyJdbcDriverTest {

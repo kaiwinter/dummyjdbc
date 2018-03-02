@@ -8,13 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.googlecode.dummyjdbc.DummyJdbcDriver;
-import com.googlecode.dummyjdbc.statement.impl.CsvStatement;
 
 public final class CsvGenericStatementTest {
 
