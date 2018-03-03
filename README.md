@@ -12,16 +12,10 @@ For more details please see the [Wiki](https://github.com/kaiwinter/dummyjdbc/wi
 <dependency>
    <groupId>com.googlecode.dummyjdbc</groupId>
    <artifactId>dummyjdbc</artifactId>
-   <version>1.2</version>
+   <version>1.3.0</version>
 </dependency>
 ```
 
+## Overview
 
-
-## Binary Downloads
-| *Filename* | *Description* | *Release Date* |
-|------------|---------------|----------------|
-| [dummyjdbc-1.2-all.jar](https://drive.google.com/file/d/0B0qVR-zttDRCeUVYcXJmV1RRcGs/view?usp=sharing) | Most current version with dependencies (slf4j, logback, aspectj) | March 2015 |
-| [dummyjdbc-1.2.jar](https://drive.google.com/file/d/0B0qVR-zttDRCelpKOUJ2REctNEk/view?usp=sharing) | Most current version | March 2015 |
-| [dummyjdbc-1.1.3-all.jar](https://drive.google.com/file/d/0B0qVR-zttDRCTy10U0R0dlpBWTA/view?usp=sharing)| Previous version without logging | July 2013 |
-| [dummyjdbc-design.png](https://code.google.com/p/dummyjdbc/downloads/detail?name=dummyjdbc-design.png&can=2&q=) | dummyjdbc in one picture | July 2013 |
+![Design](https://raw.githubusercontent.com/wiki/kaiwinter/dummyjdbc/images/dummyjdbc-design.png)
