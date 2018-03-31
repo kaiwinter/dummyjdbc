@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -12,6 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import com.googlecode.dummyjdbc.DummyJdbcDriver;
 import com.googlecode.dummyjdbc.resultset.DummyResultSet;
 import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 
@@ -22,17 +25,7 @@ import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
  */
 public class CSVResultSet extends DummyResultSet {
 
-	/**
-	 * The date format for parsing a date from a CSV file.
-	 */
-	private static final String DATE_FORMAT = "dd-MMM-yy";
 
-	private static final ThreadLocal<DateFormat> THREAD_LOCAL_DATEFORMAT = new ThreadLocal<DateFormat>() {
-		@Override
-		protected DateFormat initialValue() {
-			return new SimpleDateFormat(DATE_FORMAT);
-		}
-	};
 
 	/** Table schema */
     private DummyResultSetMetaData metaData;
@@ -156,9 +149,37 @@ public class CSVResultSet extends DummyResultSet {
 
 		return parseDate(string);
 	}
+	
+	@Override
+	public Time getTime(int columnIndex) throws SQLException {
+		String string = getValueForColumnIndex(columnIndex, Time.class);
+
+		return parseTime(string);
+	}
+	
+	@Override
+	public Time getTime(String columnLabel) throws SQLException {
+		String string = getValueForColumnLabel(columnLabel, Time.class);
+
+		return parseTime(string);
+	}
+
+	@Override
+	public Timestamp getTimestamp(int columnIndex) throws SQLException {
+		String string = getValueForColumnIndex(columnIndex, Date.class);
+
+		return parseTimestamp(string);
+	}
+	
+	@Override
+	public Timestamp getTimestamp(String columnLabel) throws SQLException {
+		String string = getValueForColumnLabel(columnLabel, Timestamp.class);
+
+		return parseTimestamp(string);
+	}
 
 	private Date parseDate(String string) throws SQLException {
-		DateFormat sdf = THREAD_LOCAL_DATEFORMAT.get();
+		DateFormat sdf = DummyJdbcDriver.THREAD_LOCAL_DATEFORMAT.get();
 		Date date = null;
 		try {
 			java.util.Date utilDate = sdf.parse(string);
@@ -166,7 +187,37 @@ public class CSVResultSet extends DummyResultSet {
 
 		} catch (ParseException e) {
 			String message = MessageFormat.format("Could not parse date: ''{0}'' using format ''{1}''", string,
-					DATE_FORMAT);
+					sdf.toString());
+			throw new SQLException(message, e);
+		}
+		return date;
+	}
+	
+	private Time parseTime(String string) throws SQLException {
+		DateFormat sdf = DummyJdbcDriver.THREAD_LOCAL_TIMEFORMAT.get();
+		Time date = null;
+		try {
+			java.util.Date utilDate = sdf.parse(string);
+			date = new Time(utilDate.getTime());
+
+		} catch (ParseException e) {
+			String message = MessageFormat.format("Could not parse date: ''{0}'' using format ''{1}''", string,
+					sdf.toString());
+			throw new SQLException(message, e);
+		}
+		return date;
+	}
+	
+	private Timestamp parseTimestamp(String string) throws SQLException {
+		DateFormat sdf = DummyJdbcDriver.THREAD_LOCAL_TIMESTAMPFORMAT.get();
+		Timestamp date = null;
+		try {
+			java.util.Date utilDate = sdf.parse(string);
+			date = new Timestamp(utilDate.getTime());
+
+		} catch (ParseException e) {
+			String message = MessageFormat.format("Could not parse date: ''{0}'' using format ''{1}''", string,
+					sdf.toString());
 			throw new SQLException(message, e);
 		}
 		return date;

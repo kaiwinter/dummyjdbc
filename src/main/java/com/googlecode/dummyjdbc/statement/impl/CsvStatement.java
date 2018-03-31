@@ -1,11 +1,13 @@
 package com.googlecode.dummyjdbc.statement.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
@@ -22,12 +24,12 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 import com.googlecode.dummyjdbc.resultset.DummyResultSet;
+import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 import com.googlecode.dummyjdbc.resultset.impl.CSVResultSet;
 import com.googlecode.dummyjdbc.statement.StatementAdapter;
-import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * This class does the actual work of the Generic... classes. It tries to open a CSV file for the table name in the
@@ -39,6 +41,11 @@ public final class CsvStatement extends StatementAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CsvStatement.class);
 
+	/**
+	 * Pattern used to recognize explicitly declared table names inside an heading comment
+	 */
+			static final Pattern COMMENT_HEADLINE_PATTERN = Pattern.compile("\\s*--\\s*TESTCASE:\\s*(.*)\\n.*", Pattern.CASE_INSENSITIVE);
+	
 	/** Pattern to get table name from an SQL statement. */
 	private static final Pattern TABLENAME_PATTERN = Pattern.compile(".*from (\\S*)\\s?.*", Pattern.CASE_INSENSITIVE);
 
@@ -59,10 +66,17 @@ public final class CsvStatement extends StatementAdapter {
 	public CsvStatement(Map<String, File> tableResources) {
 		this.tableResources = tableResources;
 	}
-
+	
 	@Override
 	public ResultSet executeQuery(String sql) throws SQLException {
 
+		// Try to check for a special heading comment within SQL
+		Matcher commentMatcher = COMMENT_HEADLINE_PATTERN.matcher(sql);
+		if (commentMatcher.matches()) {
+			String tableName = commentMatcher.group(1);
+			return createResultSet(tableName);
+		}
+		
 		// Try to interpret SQL as a SELECT on a table
 		Matcher tableMatcher = TABLENAME_PATTERN.matcher(sql);
 		if (tableMatcher.matches()) {
@@ -89,7 +103,7 @@ public final class CsvStatement extends StatementAdapter {
 	private ResultSet createResultSet(String tableName) {
 		// Does a text file for the dummy table exist?
 		File resource = tableResources.get(tableName.toLowerCase());
-		if (resource == null) {
+		if (resource == null && InMemoryCSV.get(tableName) == null) {
 			// Try to load a file from the ./tables/ directory
 			CodeSource src = CsvStatement.class.getProtectionDomain().getCodeSource();
 
@@ -108,12 +122,19 @@ public final class CsvStatement extends StatementAdapter {
 			}
 		}
 
-		FileInputStream dummyTableDataStream = null;
+		InputStream dummyTableDataStream = null;
 		try {
-			dummyTableDataStream = new FileInputStream(resource);
+			if (resource==null) {
+				String is = InMemoryCSV.get(tableName);
+				dummyTableDataStream = new ByteArrayInputStream(is.getBytes("ISO-8859-1"));
+			} else {
+				dummyTableDataStream = new FileInputStream(resource);
+			}
 			return createGenericResultSet(tableName, dummyTableDataStream);
 		} catch (FileNotFoundException e) {
 			LOGGER.info("No table definition found for '{}', using DummyResultSet.", tableName);
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.error(e.getMessage(),e);
 		} finally {
 			if (dummyTableDataStream != null) {
 				try {

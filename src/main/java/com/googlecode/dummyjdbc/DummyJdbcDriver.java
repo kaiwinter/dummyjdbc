@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,34 @@ import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
  * @author Kai Winter
  */
 public final class DummyJdbcDriver implements Driver {
+
+	/**
+	 * The date format for parsing a date from a CSV file.
+	 */
+	private static final String DATE_FORMAT = "dd-MMM-yy";
+	private static final String TIME_FORMAT = "HH:mm";
+	private static final String TIMESTAMP_FORMAT = "yyyyMMdd HHmmss.SSS";
+
+	public static final ThreadLocal<DateFormat> THREAD_LOCAL_DATEFORMAT = new ThreadLocal<DateFormat>() {
+		@Override
+		protected DateFormat initialValue() {
+			return new SimpleDateFormat(DATE_FORMAT);
+		}
+	};
+
+	public static final ThreadLocal<DateFormat> THREAD_LOCAL_TIMEFORMAT = new ThreadLocal<DateFormat>() {
+		@Override
+		protected DateFormat initialValue() {
+			return new SimpleDateFormat(TIME_FORMAT);
+		}
+	};
+
+	public static final ThreadLocal<DateFormat> THREAD_LOCAL_TIMESTAMPFORMAT = new ThreadLocal<DateFormat>() {
+		@Override
+		protected DateFormat initialValue() {
+			return new SimpleDateFormat(TIMESTAMP_FORMAT);
+		}
+	};
 
 	private final static String DEFAULT_DATABASE = "any";
 
@@ -71,7 +101,9 @@ public final class DummyJdbcDriver implements Driver {
 
 	@Override
 	public boolean acceptsURL(String url) throws SQLException {
-		return true;
+		return
+			url.equals("any") ||	// used by JUnit test cases
+			url.toLowerCase().startsWith("jdbc::mock::");
 	}
 
 	@Override
@@ -91,6 +123,33 @@ public final class DummyJdbcDriver implements Driver {
 	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		return null;
+	}
+
+	/**
+	 * Used for parsing CSV
+	 * 
+	 * @param format {@link SimpleDataFormat} pattern
+	 */
+	public static void setDateFormat(String format) {
+		THREAD_LOCAL_DATEFORMAT.set(new SimpleDateFormat(format));
+	}
+	
+	/**
+	 * Used for parsing CSV
+	 * 
+	 * @param format {@link SimpleDataFormat} pattern
+	 */
+	public static void setTimeFormat(String format) {
+		THREAD_LOCAL_TIMEFORMAT.set(new SimpleDateFormat(format));
+	}
+
+	/**
+	 * Used for parsing CSV
+	 * 
+	 * @param format {@link SimpleDataFormat} pattern
+	 */
+	public static void setTimestampFormat(String format) {
+		THREAD_LOCAL_TIMESTAMPFORMAT.set(new SimpleDateFormat(format));
 	}
 
 	/**

@@ -1,6 +1,8 @@
 package com.googlecode.dummyjdbc.statement.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -68,5 +70,77 @@ public final class CsvPreparedStatementTest {
 		resultSet.getInt(17);
 
 		Assert.fail("Expected exception not thrown");
+	}
+
+	@Test
+	public void testInMemoryCSVFromString() throws ClassNotFoundException, URISyntaxException, SQLException {
+		Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+		InMemoryCSV.register("TEST1", 
+								"\n"+
+								"name, age\n"+
+								"John, 20"+
+								"\n"
+		);
+		
+		Connection connection = DriverManager.getConnection("any");
+		PreparedStatement statement = connection.prepareStatement(
+				"-- TESTCASE:test1\n"+
+				"SELECT * FROM test_table");
+
+		Assert.assertTrue(statement instanceof CsvPreparedStatement);
+		resultSet = statement.executeQuery();
+		
+		Assert.assertTrue(resultSet.next());
+		Assert.assertEquals("John", resultSet.getString(1));
+		Assert.assertEquals(20, resultSet.getInt(2));
+		Assert.assertEquals("John", resultSet.getString("name"));
+		Assert.assertEquals(20, resultSet.getInt("age"));
+	}
+	
+	@Test
+	public void testInMemoryCSVFromInputStream() throws ClassNotFoundException, URISyntaxException, SQLException, UnsupportedEncodingException {
+		Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+		InMemoryCSV.register("TEST1", 
+				new ByteArrayInputStream(
+								("name, age\n"+
+								"John, 20").getBytes("ISO-8859-1")
+								)
+		);
+		
+		Connection connection = DriverManager.getConnection("any");
+		PreparedStatement statement = connection.prepareStatement(
+				"-- TESTCASE:test1\n"+
+				"SELECT * FROM test_table");
+
+		Assert.assertTrue(statement instanceof CsvPreparedStatement);
+		resultSet = statement.executeQuery();
+		
+		Assert.assertTrue(resultSet.next());
+		Assert.assertEquals("John", resultSet.getString(1));
+		Assert.assertEquals(20, resultSet.getInt(2));
+		Assert.assertEquals("John", resultSet.getString("name"));
+		Assert.assertEquals(20, resultSet.getInt("age"));
+	}
+	
+	@Test
+	public void testInsertWithInMemoryCSVFromInputStream() throws ClassNotFoundException, URISyntaxException, SQLException, UnsupportedEncodingException {
+		Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+		InMemoryCSV.register("TEST1", 
+				new ByteArrayInputStream(
+								("name, age\n"+
+								"John, 20").getBytes("ISO-8859-1")
+								)
+		);
+		
+		Connection connection = DriverManager.getConnection("any");
+		PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO Target(nome,cognome)"
+				+ "VALUES (?, ?)");
+
+		Assert.assertTrue(statement instanceof CsvPreparedStatement);
+		int rows = statement.executeUpdate();		
 	}
 }
