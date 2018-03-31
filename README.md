@@ -14,7 +14,7 @@ The library can either return dummy values, or values defined by you in a CSV fi
 
 For more details please see the [Wiki](https://github.com/kaiwinter/dummyjdbc/wiki)
 
-## dummyjdbc at Maven Central
+## dummyjdbc at Maven Central (OLD: must redefine this section or merge into original repository)
 ```xml
 <dependency>
    <groupId>com.googlecode.dummyjdbc</groupId>
