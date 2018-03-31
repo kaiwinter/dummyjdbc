@@ -1,6 +1,13 @@
 # dummyjdbc 
 [![CircleCI](https://circleci.com/gh/kaiwinter/dummyjdbc.svg?style=svg)](https://circleci.com/gh/kaiwinter/dummyjdbc)
 
+This fork is intended to support:
+- in-memory CSV
+- capturing of input parameters
+
+The main purposed of this fork is to simplify the development of UnitTests with [Boomi](https://boomi.com) iPaaS.
+Using this fork you can create unit tests -without- access to the Atom's filesystem. All the test data will be stored inside the UnitTest processes.
+
 dummyjdbc answers database requests of any application with dummy data to be independent of an existing database.
 
 The library can either return dummy values, or values defined by you in a CSV file. The files are determined by the SQL query which makes this a very flexible tool. Also results of Stored Procedures can be mocked with data from CSV files.
