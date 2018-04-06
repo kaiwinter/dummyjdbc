@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,7 +77,7 @@ public final class CsvPreparedStatementTest {
 	public void testInMemoryCSVFromString() throws ClassNotFoundException, URISyntaxException, SQLException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
-		InMemoryCSV.register("TEST1", 
+		DummyJdbcDriver.addInMemoryTableResource("TEST1", 
 								"\n"+
 								"name, age\n"+
 								"John, 20"+
@@ -102,7 +103,7 @@ public final class CsvPreparedStatementTest {
 	public void testInMemoryCSVFromInputStream() throws ClassNotFoundException, URISyntaxException, SQLException, UnsupportedEncodingException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
-		InMemoryCSV.register("TEST1", 
+		DummyJdbcDriver.addInMemoryTableResource("TEST1", 
 				new ByteArrayInputStream(
 								("name, age\n"+
 								"John, 20").getBytes("ISO-8859-1")
@@ -128,7 +129,7 @@ public final class CsvPreparedStatementTest {
 	public void testInsertWithInMemoryCSVFromInputStream() throws ClassNotFoundException, URISyntaxException, SQLException, UnsupportedEncodingException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
-		InMemoryCSV.register("TEST1", 
+		DummyJdbcDriver.addInMemoryTableResource("TEST1", 
 				new ByteArrayInputStream(
 								("name, age\n"+
 								"John, 20").getBytes("ISO-8859-1")
@@ -143,4 +144,60 @@ public final class CsvPreparedStatementTest {
 		Assert.assertTrue(statement instanceof CsvPreparedStatement);
 		int rows = statement.executeUpdate();		
 	}
+	
+	@Test
+	public void testInsertWithInMemoryCSVFromInputStreamWithParameters() throws ClassNotFoundException, URISyntaxException, SQLException, UnsupportedEncodingException {
+		Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+		DummyJdbcDriver.addInMemoryTableResource("TEST1?20,hello", 
+				new ByteArrayInputStream(
+								("name, age\n"+
+								"John, 20").getBytes("ISO-8859-1")
+								)
+		);
+		
+		Connection connection = DriverManager.getConnection("any");
+		PreparedStatement statement = connection.prepareStatement(
+				"SELECT *\n"
+				+ "FROM TEST1\n"
+				+ "WHERE age= ? AND other = ?");
+
+		statement.setInt(1, 20);
+		statement.setString(2, "hello");
+		
+		resultSet = statement.executeQuery();
+		
+		Assert.assertTrue(resultSet.next());
+		Assert.assertEquals("John", resultSet.getString(1));
+		Assert.assertEquals(20, resultSet.getInt(2));
+		Assert.assertEquals("John", resultSet.getString("name"));
+		Assert.assertEquals(20, resultSet.getInt("age"));	
+	}
+	
+    @Test
+    public void insertSQL() throws Exception {
+        Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+        Connection connection = DriverManager.getConnection("any");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO test (a,b) VALUES ('a','b') ");
+
+        // 1: 0 params
+        Assert.assertTrue(statement instanceof CsvPreparedStatement);
+        boolean status = statement.execute();
+        String params = DummyJdbcDriver.getInMemoryTableResource("test_PARAMS");
+        Assert.assertEquals("", params);
+        
+        // 2: 2 params
+        statement.setString(1, "hello");
+        statement.setInt(2, 30);
+        status = statement.execute();
+        params = DummyJdbcDriver.getInMemoryTableResource("test_PARAMS");
+        Assert.assertEquals("hello,30", params);
+        
+        // 3: test params reset
+        status = statement.execute();
+        params = DummyJdbcDriver.getInMemoryTableResource("test_PARAMS");
+        Assert.assertEquals("", params);
+
+    }
 }

@@ -4,6 +4,7 @@ import com.googlecode.dummyjdbc.utils.FilenameUtils;
 import com.googlecode.dummyjdbc.utils.StringUtils;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
@@ -35,6 +37,12 @@ public final class DummyJdbcDriver implements Driver {
 	private static final String TIME_FORMAT = "HH:mm";
 	private static final String TIMESTAMP_FORMAT = "yyyyMMdd HHmmss.SSS";
 
+	/**
+	 * CSV files stored into memory 
+	 */
+	public static Map<String,String> inMemoryTableResources = new HashMap<String,String>();
+
+	
 	public static final ThreadLocal<DateFormat> THREAD_LOCAL_DATEFORMAT = new ThreadLocal<DateFormat>() {
 		@Override
 		protected DateFormat initialValue() {
@@ -83,6 +91,7 @@ public final class DummyJdbcDriver implements Driver {
 		databaseMap.put(tablename, csvFile);
 		tableResources.put(DEFAULT_DATABASE, databaseMap);
 	}
+
 
 	@Override
 	public int getMajorVersion() {
@@ -220,6 +229,31 @@ public final class DummyJdbcDriver implements Driver {
 			}
 			databaseMap.put(FilenameUtils.getBaseName(file.getName()), file);
 		}
+	}
+
+
+	public static String getInMemoryTableResource(String testID) {
+		return inMemoryTableResources.get(testID.toLowerCase().trim());
+	}
+
+
+	public static void clearInMemoryTableResources() {
+		inMemoryTableResources.clear();
+	}
+
+
+	public static void addInMemoryTableResource(String testID, String value) {
+		inMemoryTableResources.put(testID.toLowerCase().trim(), value.trim());
+	}
+
+
+	@SuppressWarnings("resource")
+	public static void addInMemoryTableResource(String testID, InputStream valueStream) {
+		// search for "end of stream" => read all the stream into the string !
+		Scanner s = new Scanner(valueStream).useDelimiter("\\A");
+	    String value = s.hasNext() ? s.next() : "";
+	    s.close();
+	    DummyJdbcDriver.addInMemoryTableResource(testID,value);
 	}
 
 

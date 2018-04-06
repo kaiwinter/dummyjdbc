@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.googlecode.dummyjdbc.DummyJdbcDriver;
 import com.googlecode.dummyjdbc.statement.PreparedStatementAdapter;
 
 /**
@@ -24,6 +25,11 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 
 	private static final Pattern UPDATE_TABLE_PATTERN = Pattern.compile("(?:--[^\\\\n]*)?\\s*update\\s*([a-zA-Z]*)\\s*", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE);
 
+	/**
+	 * Suffix used for storing the parameters last seen when running a query
+	 */
+	public static final String PARAMS_SUFFIX = "_PARAMS";
+	
 	static final int MAX_PARAMS = 500;
 	
 	/**
@@ -61,31 +67,39 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	@Override
 	public int executeUpdate(String sql) throws SQLException {
 
-		// Try to check for a special heading comment within SQL
-		Matcher commentMatcher = CsvStatement.COMMENT_HEADLINE_PATTERN.matcher(sql);
-		if (commentMatcher.matches()) {
-			targetTable4Updates = commentMatcher.group(1);
-			InMemoryCSV.register( targetTable4Updates, buildParamsString() );
-			return 1;
-		}
+		targetTable4Updates = null;
+		try {
 		
-		// Try to interpret SQL as a SELECT on a table
-		Matcher insertMatcher = INSERT_INTO_PATTERN.matcher(sql);
-		if (insertMatcher.matches()) {
-			targetTable4Updates = insertMatcher.group(1);
-			InMemoryCSV.register( targetTable4Updates, buildParamsString() );
-			return 1;
+			// Try to check for a special heading comment within SQL
+			Matcher commentMatcher = CsvStatement.COMMENT_HEADLINE_PATTERN.matcher(sql);
+			if (commentMatcher.matches()) {
+				targetTable4Updates = commentMatcher.group(1);
+				return 1;
+			}
+			
+			// Try to interpret SQL as a SELECT on a table
+			Matcher insertMatcher = INSERT_INTO_PATTERN.matcher(sql);
+			if (insertMatcher.matches()) {
+				targetTable4Updates = insertMatcher.group(1);
+				return 1;
+			}
+	
+			// Try to interpret SQL as call of a stored procedure
+			Matcher updateMatcher = UPDATE_TABLE_PATTERN.matcher(sql);
+			if (updateMatcher.matches()) {
+				targetTable4Updates = updateMatcher.group(1);
+				return 1;
+			}
+	
+			return 0;
+		
+		} finally {
+			if (targetTable4Updates!=null)
+				DummyJdbcDriver.addInMemoryTableResource( targetTable4Updates+PARAMS_SUFFIX, buildParamsString() );
+			
+			params = new Object[MAX_PARAMS];
 		}
 
-		// Try to interpret SQL as call of a stored procedure
-		Matcher updateMatcher = UPDATE_TABLE_PATTERN.matcher(sql);
-		if (updateMatcher.matches()) {
-			targetTable4Updates = updateMatcher.group(1);
-			InMemoryCSV.register( targetTable4Updates, buildParamsString() );
-			return 1;
-		}
-
-		return 0;
 	}
 
 	/**
@@ -96,7 +110,9 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 		// 1: build the string (space separated)
 		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < params.length; i++) {
-			s.append(params[i]).append(' ');
+			if (params[i]!=null)
+				s.append(params[i]);
+			s.append(" ");
 		}
 		
 		// 2: trim and add commas between parameters
@@ -169,27 +185,32 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	
 	@Override
 	public ResultSet executeQuery() throws SQLException {
-		return (currentResultSet = statement.executeQuery(sql));
+		execute(sql);
+		return currentResultSet;
 	}
 
 	@Override
 	public ResultSet executeQuery(String sql) throws SQLException {
-		return (currentResultSet = statement.executeQuery(sql));
+		execute(sql);
+		return currentResultSet;
 	}
 
 	@Override
 	public boolean execute() throws SQLException {
-		// try to generate output row
-		currentResultSet = statement.executeQuery(sql);
-		// try up update (generate params)
-		executeUpdate(sql);
-		return true;
+		return execute(sql);
 	}
 
 	@Override
 	public boolean execute(String sql) throws SQLException {
-		currentResultSet = statement.executeQuery(sql);
-		return true;
+		try {
+			statement.paramsString = buildParamsString();
+			currentResultSet = statement.executeQuery(sql);
+			// try up update (generate params)
+			executeUpdate(sql);
+			return true;
+		} finally {
+			statement.paramsString = null;
+		}
 	}
 
 	@Override

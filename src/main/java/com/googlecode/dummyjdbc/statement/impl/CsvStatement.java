@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.dummyjdbc.DummyJdbcDriver;
 import com.googlecode.dummyjdbc.resultset.DummyResultSet;
 import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 import com.googlecode.dummyjdbc.resultset.impl.CSVResultSet;
@@ -44,19 +45,24 @@ public final class CsvStatement extends StatementAdapter {
 	/**
 	 * Pattern used to recognize explicitly declared table names inside an heading comment
 	 */
-			static final Pattern COMMENT_HEADLINE_PATTERN = Pattern.compile("\\s*--\\s*TESTCASE:\\s*(.*)\\n.*", Pattern.CASE_INSENSITIVE);
+			static final Pattern COMMENT_HEADLINE_PATTERN = Pattern.compile("\\s*--\\s*TESTCASE:\\s*(.*)\\n.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 	
 	/** Pattern to get table name from an SQL statement. */
-	private static final Pattern TABLENAME_PATTERN = Pattern.compile(".*from (\\S*)\\s?.*", Pattern.CASE_INSENSITIVE);
+	private static final Pattern TABLENAME_PATTERN = Pattern.compile(".*from\\s*(\\S*)\\s?.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL );
 
 	/** Pattern to get the name of a stored procedure from an SQL statement. */
-	private static final Pattern STORED_PROCEDURE_PATTERN = Pattern.compile(".*(EXEC|EXECUTE) (\\S*)\\s?.*",
-			Pattern.CASE_INSENSITIVE);
+	private static final Pattern STORED_PROCEDURE_PATTERN = Pattern.compile(".*(EXEC|EXECUTE) (\\S*)\\s?.*",	Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern PURE_SELECT_PATTERN = Pattern.compile("select .*", Pattern.CASE_INSENSITIVE);
 
     private final Map<String, File> tableResources;
 
+    /**
+     * used to describe the "current" params.
+     * Always null when invoked from {@link CsvStatement} and may hold values when used from {@link CsvPreparedStatement}
+     */
+    String paramsString = null;
+    
 	/**
 	 * Constructs a new {@link CsvStatement}.
 	 *
@@ -99,11 +105,38 @@ public final class CsvStatement extends StatementAdapter {
 
         return new DummyResultSet();
 	}
+	
+	static String matchTablename(String sql) {
+		Matcher tableMatcher = TABLENAME_PATTERN.matcher(sql);
+		if (tableMatcher.matches()) {
+			return tableMatcher.group(1);
+		} else {
+			return null;
+		}
+	}
 
 	private ResultSet createResultSet(String tableName) {
+		InputStream inMemoryDataStream = null;
+		String inMemoryCSV = null;
+		
+		// search for "tablename?param1,param2" etc...
+		if (paramsString!=null) {
+			inMemoryCSV = DummyJdbcDriver.getInMemoryTableResource(tableName+"?"+paramsString);
+		} // then search just for "tablename"
+		if (inMemoryCSV==null) {
+			inMemoryCSV = DummyJdbcDriver.getInMemoryTableResource(tableName);			
+		} // if any in memory CSV is found convert to InputStream 
+		if (inMemoryCSV!=null) {
+			try {
+				inMemoryDataStream = new ByteArrayInputStream(inMemoryCSV.getBytes("ISO-8859-1"));
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
 		// Does a text file for the dummy table exist?
 		File resource = tableResources.get(tableName.toLowerCase());
-		if (resource == null && InMemoryCSV.get(tableName) == null) {
+		if (resource == null && inMemoryDataStream == null) {
 			// Try to load a file from the ./tables/ directory
 			CodeSource src = CsvStatement.class.getProtectionDomain().getCodeSource();
 
@@ -125,16 +158,13 @@ public final class CsvStatement extends StatementAdapter {
 		InputStream dummyTableDataStream = null;
 		try {
 			if (resource==null) {
-				String is = InMemoryCSV.get(tableName);
-				dummyTableDataStream = new ByteArrayInputStream(is.getBytes("ISO-8859-1"));
+				dummyTableDataStream = inMemoryDataStream;	// might be null => no inMemoryCSV
 			} else {
 				dummyTableDataStream = new FileInputStream(resource);
 			}
 			return createGenericResultSet(tableName, dummyTableDataStream);
 		} catch (FileNotFoundException e) {
 			LOGGER.info("No table definition found for '{}', using DummyResultSet.", tableName);
-		} catch (UnsupportedEncodingException e) {
-			LOGGER.error(e.getMessage(),e);
 		} finally {
 			if (dummyTableDataStream != null) {
 				try {

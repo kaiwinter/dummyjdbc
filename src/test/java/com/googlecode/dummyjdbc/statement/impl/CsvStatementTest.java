@@ -40,4 +40,6 @@ public final class CsvStatementTest {
         ResultSet resultSet = statement.executeQuery("SELECT 1");
         boolean next = resultSet.next();
     }
+    
+
 }
