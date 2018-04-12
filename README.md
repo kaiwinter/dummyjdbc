@@ -69,7 +69,7 @@ InMemory resource 'name' will be inferred by using some logic
 SELECT *
 FROM TableUsedEverywhere
 ```
-will search for resource: "Hello1" (case insensitive)
+will search for resource: `Hello1` (case insensitive)
 
 ### Table name deduction
 This is derived from the original dumymjdbc design, with some added REGEX for INSERT/UPDATE queries
@@ -79,7 +79,7 @@ SELECT name
 FROM mytable
 WHERE surname='Happy'
 ```
-will search for resource: "mytable" (case insensitive)
+will search for resource: `mytable` (case insensitive)
 
 ### Parameters
 In order to make possible more sophisticated test cases the driver now will try to match also parameters
