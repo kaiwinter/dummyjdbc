@@ -7,6 +7,32 @@ The library can either return dummy values, or values defined by you in a CSV fi
 
 For more details please see the [Wiki](https://github.com/kaiwinter/dummyjdbc/wiki)
 
+## Sample Usage
+
+## How in memory resources are selected
+
+### Explicit comment in SQL
+InMemory resource 'name' will be inferred by using some logic
+
+```SQL
+-- TESTCASE: Hello1
+SELECT *
+FROM TableUsedEverywhere
+```
+will search for resource: "Hello1" (case insensitive)
+
+### Table name deduction
+This is derived from the original dumymjdbc design, with some added REGEX for INSERT/UPDATE queries
+
+```SQL
+SELECT name
+FROM mytable
+WHERE surname='Happy'
+```
+will search for resource: "mytable" (case insensitive)
+
+
+
 ## dummyjdbc at Maven Central
 ```xml
 <dependency>
