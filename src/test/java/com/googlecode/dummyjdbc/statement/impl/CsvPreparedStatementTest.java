@@ -99,6 +99,7 @@ public final class CsvPreparedStatementTest {
 		Assert.assertEquals(20, resultSet.getInt("age"));
 	}
 	
+
 	@Test
 	public void testInMemoryCSVFromInputStream() throws ClassNotFoundException, URISyntaxException, SQLException, UnsupportedEncodingException {
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
