@@ -40,8 +40,8 @@ FROM mytable
 WHERE surname=? AND age=?
 ```
 with parameters "Smith" and "34" will search for resources in the following order (always case-insensitive):
-* mytable
-* mytable?Smith,34
+* `mytable`
+* `mytable?Smith,34`
 
 ## Testing INSERT/DELETE queries
 One key part of testing how the application interacts with the DB is to capture if it performed the right INSERT/UPDATE queries, this is not possible.
