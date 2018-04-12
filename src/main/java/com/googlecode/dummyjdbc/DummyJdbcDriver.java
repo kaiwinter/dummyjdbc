@@ -232,6 +232,11 @@ public final class DummyJdbcDriver implements Driver {
 	}
 
 
+	/**
+	 * Get the current value of the resource, used mainly to examine the parameters used for INSERT/UPDATE queries
+	 * @param testID
+	 * @return
+	 */
 	public static String getInMemoryTableResource(String testID) {
 		return inMemoryTableResources.get(testID.toLowerCase().trim());
 	}
@@ -242,11 +247,23 @@ public final class DummyJdbcDriver implements Driver {
 	}
 
 
+	/**
+	 * Add the CSV contained the string 'value' to the list of available resultsets
+	 *  
+	 * @param testID
+	 * @param value
+	 */
 	public static void addInMemoryTableResource(String testID, String value) {
 		inMemoryTableResources.put(testID.toLowerCase().trim(), value.trim());
 	}
 
 
+	/**
+	 * Add the CSV contained the InputStream 'valueStream' to the list of available resultsets
+	 *  
+	 * @param testID
+	 * @param value
+	 */
 	@SuppressWarnings("resource")
 	public static void addInMemoryTableResource(String testID, InputStream valueStream) {
 		// search for "end of stream" => read all the stream into the string !

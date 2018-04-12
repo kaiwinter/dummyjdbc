@@ -180,24 +180,24 @@ public final class CsvPreparedStatementTest {
         Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
         Connection connection = DriverManager.getConnection("any");
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO test (a,b) VALUES ('a','b') ");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (name,age) VALUES (?,?) ");
 
         // 1: 0 params
         Assert.assertTrue(statement instanceof CsvPreparedStatement);
         boolean status = statement.execute();
-        String params = DummyJdbcDriver.getInMemoryTableResource("test_PARAMS");
+        String params = DummyJdbcDriver.getInMemoryTableResource("users_PARAMS");
         Assert.assertEquals("", params);
         
         // 2: 2 params
         statement.setString(1, "hello");
         statement.setInt(2, 30);
         status = statement.execute();
-        params = DummyJdbcDriver.getInMemoryTableResource("test_PARAMS");
+        params = DummyJdbcDriver.getInMemoryTableResource("users_PARAMS");
         Assert.assertEquals("hello,30", params);
         
         // 3: test params reset
         status = statement.execute();
-        params = DummyJdbcDriver.getInMemoryTableResource("test_PARAMS");
+        params = DummyJdbcDriver.getInMemoryTableResource("users_PARAMS");
         Assert.assertEquals("", params);
 
     }
