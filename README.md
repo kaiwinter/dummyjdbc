@@ -31,6 +31,23 @@ WHERE surname='Happy'
 ```
 will search for resource: "mytable" (case insensitive)
 
+### Parameters
+In order to make possible more sophisticated test cases the driver now will try to match also parameters
+So the following query:
+```SQL
+SELECT name
+FROM mytable
+WHERE surname=? AND age=?
+```
+with parameters "Smith" and "34" will search for resources in the following order (always case-insensitive):
+* mytable
+* mytable?Smith,34
+
+## Testing INSERT/DELETE queries
+One key part of testing how the application interacts with the DB is to capture if it performed the right INSERT/UPDATE queries, this is not possible.
+
+### How to know which parameters have been used for a query
+### Sample code
 
 
 ## dummyjdbc at Maven Central
