@@ -1,5 +1,5 @@
 # dummyjdbc 
-[![CircleCI](https://circleci.com/gh/SimoneAvogadro/dummyjdbc.svg?style=svg)](https://circleci.com/gh/SimoneAvogadro/dummyjdbc)
+[![CircleCI](https://circleci.com/gh/kaiwinter/dummyjdbc.svg?style=svg)](https://circleci.com/gh/kaiwinter/dummyjdbc)
 
 dummyjdbc answers database requests of any application with dummy data to be independent of an existing database.
 
@@ -7,7 +7,57 @@ The library can either return dummy values, or values defined by you in a CSV fi
 
 For more details please see the [Wiki](https://github.com/kaiwinter/dummyjdbc/wiki)
 
+## New Methods in 1.4.0
+Three new methods have been added to `com.googlecode.dummyjdbc.DummyJdbcDriver` in order to support:
+* InMemory resources for resultsets
+* differentiated resultsers depending on query parameters
+* capturing INSERT/UPDATE parameters
+
+```Java
+/**
+ * Add the CSV contained the string 'value' to the list of available resultsets
+ */
+public static void addInMemoryTableResource(String testID, String value);
+
+/**
+ * Add the CSV contained the InputStream 'valueStream' to the list of available resultsets
+ */
+public static void addInMemoryTableResource(String testID, InputStream valueStream);
+
+/**
+ * Get the current value of the resource, used mainly to examine the parameters used for INSERT/UPDATE queries
+ */
+public static String getInMemoryTableResource(String testID);
+```
+
 ## Sample Usage
+```java
+@Test
+public void testInMemoryCSVFromString() throws ClassNotFoundException, URISyntaxException, SQLException {
+   Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+   DummyJdbcDriver.addInMemoryTableResource("TEST1", 
+                     "\n"+
+                     "name, age\n"+
+                     "John, 20"+
+                     "\n"
+   );
+
+   Connection connection = DriverManager.getConnection("any");
+   PreparedStatement statement = connection.prepareStatement(
+         "-- TESTCASE:test1\n"+
+         "SELECT * FROM test_table");
+
+   Assert.assertTrue(statement instanceof CsvPreparedStatement);
+   resultSet = statement.executeQuery();
+
+   Assert.assertTrue(resultSet.next());
+   Assert.assertEquals("John", resultSet.getString(1));
+   Assert.assertEquals(20, resultSet.getInt(2));
+   Assert.assertEquals("John", resultSet.getString("name"));
+   Assert.assertEquals(20, resultSet.getInt("age"));
+}
+```
 
 ## How in memory resources are selected
 
@@ -45,9 +95,26 @@ with parameters "Smith" and "34" will search for resources in the following orde
 
 ## Testing INSERT/DELETE queries
 One key part of testing how the application interacts with the DB is to capture if it performed the right INSERT/UPDATE queries, this is not possible.
+When updating a table now the parameters are captured and stored into a String which will be accessible for testing purposes
 
 ### How to know which parameters have been used for a query
+A new InMemory resource will be created with name euals to the name of the table + `_PARAMS`
+E.g: when updating table `users` a new key will be added with name `users_PARAMS`
+
 ### Sample code
+
+```java
+        Class.forName(DummyJdbcDriver.class.getCanonicalName());
+
+        Connection connection = DriverManager.getConnection("any");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (name,age) VALUES (?,?) ");
+
+        statement.setString(1, "hello");
+        statement.setInt(2, 30);
+        status = statement.execute();
+        params = DummyJdbcDriver.getInMemoryTableResource("users_PARAMS");
+        Assert.assertEquals("hello,30", params);
+```
 
 
 ## dummyjdbc at Maven Central
