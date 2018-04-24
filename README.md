@@ -90,15 +90,16 @@ FROM mytable
 WHERE surname=? AND age=?
 ```
 with parameters "Smith" and "34" will search for resources in the following order (always case-insensitive):
-* `mytable`
 * `mytable?Smith,34`
+* `mytable`
 
 ## Testing INSERT/DELETE queries
-One key part of testing how the application interacts with the DB is to capture if it performed the right INSERT/UPDATE queries, this is not possible.
+One key part of testing how the application interacts with the DB is to capture if it performed the right INSERT/UPDATE queries, this is now possible.
+
 When updating a table now the parameters are captured and stored into a String which will be accessible for testing purposes
 
 ### How to know which parameters have been used for a query
-A new InMemory resource will be created with name euals to the name of the table + `_PARAMS`
+A new InMemory resource will be created with name equals to the name of the table + `_PARAMS`
 E.g: when updating table `users` a new key will be added with name `users_PARAMS`
 
 ### Sample code
