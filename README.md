@@ -118,7 +118,9 @@ E.g: when updating table `users` a new key will be added with name `users_PARAMS
 ```
 
 
-## dummyjdbc at Maven Central
+## dummyjdbc at Maven Central [OUTDATED]
+
+In order to use the official 1.3 version you can use Maven
 ```xml
 <dependency>
    <groupId>com.googlecode.dummyjdbc</groupId>
@@ -126,6 +128,9 @@ E.g: when updating table `users` a new key will be added with name `users_PARAMS
    <version>1.3.0</version>
 </dependency>
 ```
+
+In order to use v 1.4.0 at present you must download it directly from GitHub
+
 
 ## Overview
 
