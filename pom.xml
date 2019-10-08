@@ -2,14 +2,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.googlecode.dummyjdbc</groupId>
 	<artifactId>dummyjdbc</artifactId>
-	<version>1.3.1-SNAPSHOT</version>
+	<version>1.4.0</version>
 	<packaging>jar</packaging>
 
 	<name>DummyJDBC</name>
 	<description>
 		DummyJDBC is a mock JDBC driver which can return data from CSV files 
 	</description>
-	<url>https://github.com/kaiwinter/dummyjdbc</url>
+	<url>https://github.com/SimoneAvogadro/dummyjdbc</url>
 	<licenses>
 		<license>
 			<name>Apache 2</name>
@@ -19,9 +19,9 @@
 	</licenses>
 
 	<scm>
-		<url>https://github.com/kaiwinter/dummyjdbc</url>
-		<connection>scm:git:https://github.com/kaiwinter/dummyjdbc.git</connection>
-		<developerConnection>scm:git:git@github.com:kaiwinter/dummyjdbc.git</developerConnection>
+		<url>https://github.com/SimoneAvogadro/dummyjdbc</url>
+		<connection>scm:git:https://github.com/SimoneAvogadro/dummyjdbc.git</connection>
+		<developerConnection>scm:git:git@github.com:SimoneAvogadro/dummyjdbc.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -29,11 +29,15 @@
 			<id>kai</id>
 			<name>Kai Winter</name>
 		</developer>
+		<developer>
+			<id>simone</id>
+			<name>Simone Avogadro</name>
+		</developer>
 	</developers>
 
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/kaiwinter/dummyjdbc/issues</url>
+		<url>https://github.com/SimoneAvogadro/dummyjdbc/issues</url>
 	</issueManagement>
 
 	<properties>
