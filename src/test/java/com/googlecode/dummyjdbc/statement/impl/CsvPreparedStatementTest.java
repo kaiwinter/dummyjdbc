@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,6 +25,8 @@ public final class CsvPreparedStatementTest {
 
 	@Before
 	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+		
 		Class.forName(DummyJdbcDriver.class.getCanonicalName());
 
 		DummyJdbcDriver.addTableResource("test_table", new File(CsvGenericStatementTest.class.getResource(
@@ -48,13 +51,13 @@ public final class CsvPreparedStatementTest {
 
 	@Test
 	public void testBuildParamsString() {
-		csvStatement.params[1]=new java.sql.Timestamp(1570623440352L);  // 2019-10-09,14:17:20.352
+		csvStatement.params[1]=new java.sql.Timestamp(1570623440352L);  // 2019-10-09,14:17:20.352 GMT+2
 		csvStatement.params[2]=new Integer(920);
 		csvStatement.params[3]="hello";
 		
 		String res = csvStatement.buildParamsString();
 		// System.out.println("RES: "+res);
-		Assert.assertEquals("20191009 141720.352,920,hello", res);
+		Assert.assertEquals("20191009 121720.352,920,hello", res);
 	}
 	
 	@Test
