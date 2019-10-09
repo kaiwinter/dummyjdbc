@@ -48,9 +48,9 @@ public final class CsvPreparedStatementTest {
 
 	@Test
 	public void testBuildParamsString() {
-		csvStatement.params[0]=new java.sql.Timestamp(1570623440352L);  // 2019-10-09,14:17:20.352
-		csvStatement.params[1]=new Integer(920);
-		csvStatement.params[2]="hello";
+		csvStatement.params[1]=new java.sql.Timestamp(1570623440352L);  // 2019-10-09,14:17:20.352
+		csvStatement.params[2]=new Integer(920);
+		csvStatement.params[3]="hello";
 		
 		String res = csvStatement.buildParamsString();
 		// System.out.println("RES: "+res);

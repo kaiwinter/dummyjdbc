@@ -109,8 +109,8 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	String buildParamsString() {
 		// 1: build the string (space separated)
 		StringBuilder s = new StringBuilder();
-		for (int i = 0; i < params.length; i++) {
-			if (i>0)
+		for (int i = 1; i < params.length; i++) { // SQL param index starts from 1 !!
+			if (i>1)
 				s.append(",");
 			if (params[i]!=null) {
 				if (params[i] instanceof java.util.Date) {
