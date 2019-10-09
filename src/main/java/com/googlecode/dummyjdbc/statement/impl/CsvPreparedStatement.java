@@ -106,18 +106,30 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	 * build a string representing the objects which have been received
 	 * @return
 	 */
-	private String buildParamsString() {
+	String buildParamsString() {
 		// 1: build the string (space separated)
 		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < params.length; i++) {
-			if (params[i]!=null)
-				s.append(params[i]);
-			s.append(" ");
+			if (i>0)
+				s.append(",");
+			if (params[i]!=null) {
+				if (params[i] instanceof java.util.Date) {
+					if (params[i] instanceof java.sql.Date) {
+						s.append(DummyJdbcDriver.THREAD_LOCAL_DATEFORMAT.get().format((java.util.Date)params[i]));
+					} else if (params[i] instanceof java.sql.Time) {
+						s.append(DummyJdbcDriver.THREAD_LOCAL_TIMEFORMAT.get().format((java.util.Date)params[i]));
+					} else {
+						s.append(DummyJdbcDriver.THREAD_LOCAL_TIMESTAMPFORMAT.get().format((java.util.Date)params[i]));
+					}
+				} else {
+					s.append(params[i]);									
+				}
+			}
 		}
 		
-		// 2: trim and add commas between parameters
+		// 2: trim and replace tailing commas
 		String res = s.toString().trim();
-		res = res.replace(' ', ',');
+		res = res.replaceAll(",*$", "");
 		
 		return res;
 	}

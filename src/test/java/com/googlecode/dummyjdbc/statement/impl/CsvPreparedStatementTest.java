@@ -20,6 +20,7 @@ import com.googlecode.dummyjdbc.DummyJdbcDriver;
 public final class CsvPreparedStatementTest {
 
 	private ResultSet resultSet;
+	CsvPreparedStatement csvStatement;
 
 	@Before
 	public void setup() throws ClassNotFoundException, SQLException, URISyntaxException {
@@ -31,6 +32,7 @@ public final class CsvPreparedStatementTest {
 		PreparedStatement statement = connection.prepareStatement("SELECT * FROM test_table");
 
 		Assert.assertTrue(statement instanceof CsvPreparedStatement);
+		csvStatement = (CsvPreparedStatement)statement;
 		resultSet = statement.executeQuery();
 	}
 
@@ -44,6 +46,17 @@ public final class CsvPreparedStatementTest {
 		Assert.assertEquals("DE", resultSet.getString("country_iso"));
 	}
 
+	@Test
+	public void testBuildParamsString() {
+		csvStatement.params[0]=new java.sql.Timestamp(1570623440352L);  // 2019-10-09,14:17:20.352
+		csvStatement.params[1]=new Integer(920);
+		csvStatement.params[2]="hello";
+		
+		String res = csvStatement.buildParamsString();
+		// System.out.println("RES: "+res);
+		Assert.assertEquals("20191009 141720.352,920,hello", res);
+	}
+	
 	@Test
 	public void testGetByColumnIndex() throws SQLException {
 
