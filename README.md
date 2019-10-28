@@ -7,6 +7,30 @@ The library can either return dummy values, or values defined by you in a CSV fi
 
 For more details please see the [Wiki](https://github.com/kaiwinter/dummyjdbc/wiki)
 
+## New Methods in 1.5.0
+Refactored package in order to use `com.mindmercatis` instead of `com.googlecode` in order to proceed with the fork and keep releasing new versions.
+
+Three new methods have been added to `com.mindmercatis.dummyjdbc.DummyJdbcDriver` in order to support:
+* Preparing tests as a simple sequence of expected table results
+
+```java
+@Test
+   Class.forName(DummyJdbcDriver.class.getCanonicalName());
+   DummyJdbcDriver.reset(); //reset the step counter 
+   DummyJdbcDriver.addInMemoryTableResource(0,	// result set for the first query which will be executed 
+                     "name, age\n"+
+                     "John, 20"  );
+   DummyJdbcDriver.addInMemoryTableResource(1,	// result set for the second query which will be executed 
+                     "id, country\n"+
+                     "1, Italy\n"+
+                     "2, USA"  );
+   DummyJdbcDriver.addInMemoryTableResource(2,	// result set for the third query which will be executed 
+                     "id, make, model, owner\n"+
+                     "1, Mazda, CX-5, Mark Twain\n"+
+                     "2, Ford, Focus, JF Kennedy"  );
+```
+
+
 ## New Methods in 1.4.0
 Three new methods have been added to `com.googlecode.dummyjdbc.DummyJdbcDriver` in order to support:
 * InMemory resources for resultsets
@@ -93,7 +117,7 @@ with parameters "Smith" and "34" will search for resources in the following orde
 * `mytable?Smith,34`
 * `mytable`
 
-## Testing INSERT/DELETE queries
+## Testing INSERT/UPDATE/DELETE queries
 One key part of testing how the application interacts with the DB is to capture if it performed the right INSERT/UPDATE queries, this is now possible.
 
 When updating a table now the parameters are captured and stored into a String which will be accessible for testing purposes
@@ -120,12 +144,12 @@ E.g: when updating table `users` a new key will be added with name `users_PARAMS
 
 ## dummyjdbc at Maven Central [OUTDATED]
 
-In order to use the official 1.3 version you can use Maven
+In order to use the official version you can use Maven
 ```xml
 <dependency>
-   <groupId>com.googlecode.dummyjdbc</groupId>
+   <groupId>com.mindmercastis.dummyjdbc</groupId>
    <artifactId>dummyjdbc</artifactId>
-   <version>1.3.0</version>
+   <version>1.5.0</version>
 </dependency>
 ```
 
