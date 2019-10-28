@@ -14,7 +14,6 @@ Three new methods have been added to `com.mindmercatis.dummyjdbc.DummyJdbcDriver
 * Preparing tests as a simple sequence of expected table results
 
 ```java
-@Test
    Class.forName(DummyJdbcDriver.class.getCanonicalName());
    DummyJdbcDriver.reset(); //reset the step counter 
    DummyJdbcDriver.addInMemoryTableResource(0,	// result set for the first query which will be executed 
