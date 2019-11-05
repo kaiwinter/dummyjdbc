@@ -74,7 +74,12 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 			
 			if (stepRes!=null) {
 				targetTable4Updates = DummyJdbcDriver.getStepName();
-				return Integer.parseInt(stepRes);
+				try {
+					return Integer.parseInt(stepRes);
+				} catch (NumberFormatException nfe) {
+					// that's ok, it's a simple resultset rather then an update query
+					return 0;
+				}
 			}
 
 			// Try to check for a special heading comment within SQL
@@ -106,7 +111,7 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 			
 			params = new Object[MAX_PARAMS];
 			
-			DummyJdbcDriver.nextStep();
+			
 		}
 
 	}
@@ -252,5 +257,10 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	@Override
 	public ResultSet getResultSet() throws SQLException {
 		return currentResultSet;
+	}
+	
+	@Override
+	public void close() throws SQLException {
+		DummyJdbcDriver.nextStep();
 	}
 }
