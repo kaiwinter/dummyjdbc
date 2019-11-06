@@ -46,14 +46,6 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	private final String sql;
 
 	private ResultSet currentResultSet;
-
-    /**
-     * Initializer
-     * 
-     */
-    {
-    	DummyJdbcDriver.nextStep();
-    }
 	
 	/**
 	 * Constructs a new {@link CsvPreparedStatement}.

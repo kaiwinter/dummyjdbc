@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.TimeZone;
 
 import org.junit.Assert;
@@ -216,4 +217,57 @@ public final class CsvPreparedStatementTest {
         Assert.assertEquals("", params);
 
     }
+    
+	/**
+	 * Within this text we expect the results to be read from memory based on the number of the execution step,
+	 * ignoring the table name and comments
+	 * 
+	 * @throws SQLException
+	 * @throws URISyntaxException
+	 */
+	@Test
+	public void testQueryByStep() throws SQLException, URISyntaxException {
+
+		DummyJdbcDriver.reset();
+		DummyJdbcDriver.addInMemoryTableResource(0, 
+				"\n"
+				+ "name, age\n"+
+				"John, 20"+
+				"\n"
+				);
+		DummyJdbcDriver.addInMemoryTableResource(1, 
+				"\n"
+				+ "where, who\n"+
+				"London, Sherlock"+
+				"\n"
+				);
+		
+		Connection connection = DriverManager.getConnection("any");
+		Statement statement = connection.prepareStatement("ignore me");
+
+		Assert.assertTrue(statement instanceof CsvPreparedStatement);
+		resultSet = statement.executeQuery(
+				  "-- TESTCASE:test1\n"
+				+ "SELECT *\n"
+				+ "FROM test_table");
+		
+		Assert.assertTrue(resultSet.next());
+		Assert.assertEquals("John", resultSet.getString("name"));
+		Assert.assertEquals(20, resultSet.getInt("age"));
+		
+		// test 2nd step
+		statement = connection.prepareStatement("ignore me");
+
+		Assert.assertTrue(statement instanceof CsvPreparedStatement);
+		resultSet = statement.executeQuery(
+				  "-- TESTCASE:test2\n"
+				+ "SELECT *\n"
+				+ "FROM test_table");
+		
+		Assert.assertTrue(resultSet.next());
+		Assert.assertEquals("London", resultSet.getString("where"));
+		Assert.assertEquals("Sherlock", resultSet.getString("who"));
+	}
+
+    
 }
