@@ -47,6 +47,14 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 
 	private ResultSet currentResultSet;
 
+    /**
+     * Initializer
+     * 
+     */
+    {
+    	DummyJdbcDriver.nextStep();
+    }
+	
 	/**
 	 * Constructs a new {@link CsvPreparedStatement}.
 	 *
@@ -259,8 +267,5 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 		return currentResultSet;
 	}
 	
-	@Override
-	public void close() throws SQLException {
-		DummyJdbcDriver.nextStep();
-	}
+
 }

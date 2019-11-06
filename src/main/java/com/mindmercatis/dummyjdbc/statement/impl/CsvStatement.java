@@ -63,6 +63,15 @@ public final class CsvStatement extends StatementAdapter {
      */
     String paramsString = null;
     
+    
+    /**
+     * Initializer
+     * 
+     */
+    {
+    	DummyJdbcDriver.nextStep();
+    }
+    
 	/**
 	 * Constructs a new {@link CsvStatement}.
 	 *
@@ -260,10 +269,6 @@ public final class CsvStatement extends StatementAdapter {
 	private String resolveHeaderName(String str) {
 	    return str.trim().toUpperCase();
     }
-	
-	@Override
-	public void close() throws SQLException {
-		DummyJdbcDriver.nextStep();
-	}
+
 
 }

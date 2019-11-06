@@ -41,9 +41,10 @@ public final class DummyJdbcDriver implements Driver {
 	
 	/**
 	 * Counter for the number of statements being executed
-	 * Used to 
+	 * Used to give a sequential number to each query
+	 * Starts from -1 because it's pre-incremented once each statement is created
 	 */
-	static int step = 0;
+	static int step = -1;
 	
 	/**
 	 * CSV files stored into memory 
@@ -88,7 +89,7 @@ public final class DummyJdbcDriver implements Driver {
 	 * Reset the internal data structures to restart counting
 	 */
 	public static void reset() {
-		step = 0;
+		step = -1;
 		inMemoryTableResources = new HashMap<String,String>();
 		tableResources = Collections.synchronizedMap(new HashMap<String, Map<String, File>>());
 	}

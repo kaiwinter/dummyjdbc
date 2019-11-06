@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 1.5.1
+----------------------------
+
+ * Fixed issues with using step number to identify testing data
+
 Version 1.5.0
 ----------------------------
 
