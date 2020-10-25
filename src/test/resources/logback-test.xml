@@ -5,7 +5,7 @@
 		</encoder>
 	</appender>
 	
-	<logger name="com.googlecode.dummyjdbc" level="TRACE"/>
+	<logger name="com.mindmercatis.dummyjdbc" level="TRACE"/>
 	
 	<root level="debug">
 		<appender-ref ref="STDOUT" />
