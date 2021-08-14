@@ -102,8 +102,7 @@ public final class DummyJdbcDriver implements Driver {
 	/**
 	 * Parse jdbc url to database file path
 	 *
-	 * @param url
-	 * 	jdbc url
+	 * @param url 	jdbc url
 	 * @return database file path
 	 */
 	private String parseConnectUrl(String url) {
@@ -127,8 +126,7 @@ public final class DummyJdbcDriver implements Driver {
 	/**
 	 * load table resources from database directory
 	 *
-	 * @param database
-	 * 	database path
+	 * @param database database path
 	 */
 	private void loadTableResources(String database) {
 		// ignore database name is any
@@ -136,7 +134,7 @@ public final class DummyJdbcDriver implements Driver {
 			return;
 		}
 
-		// check database is exists
+		// check database exists
 		URL dirUrl = getClass().getClassLoader().getResource(database);
 		if (dirUrl == null) {
 			throw new RuntimeException("The database directory is not exists");
