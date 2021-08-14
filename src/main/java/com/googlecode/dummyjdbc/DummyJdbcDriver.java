@@ -45,9 +45,9 @@ public final class DummyJdbcDriver implements Driver {
 	 * given <code>csvFile</code> for the given <code>tablename</code> <code>addresses</code> will be used.
 	 *
 	 * @param tablename
-	 * 		The name of the database table like in the SQL statement (e.g. addresses).
+	 *         The name of the database table like in the SQL statement (e.g. addresses).
 	 * @param csvFile
-	 * 		A {@link File} object of a CSV file which should be parsed in order to return table data.
+	 *         A {@link File} object of a CSV file which should be parsed in order to return table data.
 	 */
 	public static void addTableResource(String tablename, File csvFile) {
 		Map<String, File> databaseMap;
