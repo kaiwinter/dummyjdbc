@@ -44,8 +44,10 @@ public final class DummyJdbcDriver implements Driver {
 	 * Registers a CSV file for a database table. When a Query is executed like <code>SELECT * FROM ADDRESSES</code> the
 	 * given <code>csvFile</code> for the given <code>tablename</code> <code>addresses</code> will be used.
 	 *
-	 * @param tablename The name of the database table like in the SQL statement (e.g. addresses).
-	 * @param csvFile   A {@link File} object of a CSV file which should be parsed in order to return table data.
+	 * @param tablename
+	 * 			The name of the database table like in the SQL statement (e.g. addresses).
+	 * @param csvFile
+	 * 			A {@link File} object of a CSV file which should be parsed in order to return table data.
 	 */
 	public static void addTableResource(String tablename, File csvFile) {
 		Map<String, File> databaseMap;
@@ -100,7 +102,8 @@ public final class DummyJdbcDriver implements Driver {
 	/**
 	 * Parse jdbc url to database file path
 	 *
-	 * @param url jdbc url
+	 * @param url
+	 * 	jdbc url
 	 * @return database file path
 	 */
 	private String parseConnectUrl(String url) {
@@ -124,7 +127,8 @@ public final class DummyJdbcDriver implements Driver {
 	/**
 	 * load table resources from database directory
 	 *
-	 * @param database database path
+	 * @param database
+	 * 	database path
 	 */
 	private void loadTableResources(String database) {
 		// ignore database name is any
