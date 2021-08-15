@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.googlecode.dummyjdbc</groupId>
 	<artifactId>dummyjdbc</artifactId>
-	<version>1.3.1-SNAPSHOT</version>
+	<version>1.3.1</version>
 	<packaging>jar</packaging>
 
 	<name>DummyJDBC</name>
@@ -22,7 +22,8 @@
 		<url>https://github.com/kaiwinter/dummyjdbc</url>
 		<connection>scm:git:https://github.com/kaiwinter/dummyjdbc.git</connection>
 		<developerConnection>scm:git:git@github.com:kaiwinter/dummyjdbc.git</developerConnection>
-	</scm>
+	  <tag>dummyjdbc-1.3.1</tag>
+  </scm>
 
 	<developers>
 		<developer>
@@ -113,7 +114,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
