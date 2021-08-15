@@ -1,7 +1,9 @@
 package com.googlecode.dummyjdbc;
 
+import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
 import com.googlecode.dummyjdbc.utils.FilenameUtils;
 import com.googlecode.dummyjdbc.utils.StringUtils;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
@@ -17,8 +19,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.googlecode.dummyjdbc.connection.impl.DummyConnection;
-
 /**
  * The {@link DummyJdbcDriver}. The {@link #connect(String, Properties)} method returns the {@link DummyConnection}.
  *
@@ -28,7 +28,8 @@ public final class DummyJdbcDriver implements Driver {
 
 	private final static String DEFAULT_DATABASE = "any";
 
-	private static Map<String, Map<String, File>> tableResources = Collections.synchronizedMap(new HashMap<String, Map<String, File>>());
+	private static final Map<String, Map<String, File>> tableResources = Collections.synchronizedMap(
+		new HashMap<String, Map<String, File>>());
 
 	static {
 		try {
@@ -49,8 +50,13 @@ public final class DummyJdbcDriver implements Driver {
 	 *            A {@link File} object of a CSV file which should be parsed in order to return table data.
 	 */
 	public static void addTableResource(String tablename, File csvFile) {
-		Map<String, File> databaseMap = Collections.synchronizedMap(new HashMap<String, File>());
-		databaseMap.put(tablename, csvFile);
+		Map<String, File> databaseMap;
+		if (tableResources.containsKey(DEFAULT_DATABASE)) {
+			databaseMap = tableResources.get(DEFAULT_DATABASE);
+		} else {
+			databaseMap = Collections.synchronizedMap(new HashMap<String, File>());
+		}
+		databaseMap.put(tablename.toLowerCase(), csvFile);
 		tableResources.put(DEFAULT_DATABASE, databaseMap);
 	}
 
@@ -111,13 +117,10 @@ public final class DummyJdbcDriver implements Driver {
 
 		final String others = url.substring("jdbc::mock::".length());
 		final String[] items = others.split("::");
-		switch(items.length) {
-			case 0:
-				throw new RuntimeException("No database directory defined");
-			default:
-				return StringUtils.join(items, "/");
+		if (items.length == 0) {
+			throw new RuntimeException("No database directory defined");
 		}
-
+		return StringUtils.join(items, "/");
 	}
 
 	/**
@@ -131,7 +134,7 @@ public final class DummyJdbcDriver implements Driver {
 			return;
 		}
 
-		// check database is exists
+		// check database exists
 		URL dirUrl = getClass().getClassLoader().getResource(database);
 		if (dirUrl == null) {
 			throw new RuntimeException("The database directory is not exists");
@@ -162,6 +165,5 @@ public final class DummyJdbcDriver implements Driver {
 			databaseMap.put(FilenameUtils.getBaseName(file.getName()), file);
 		}
 	}
-
 
 }
