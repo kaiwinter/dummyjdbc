@@ -18,10 +18,8 @@
 package com.googlecode.dummyjdbc.utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Stack;
 
 /**
  * General filename and filepath manipulation utilities.
