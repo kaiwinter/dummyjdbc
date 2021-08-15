@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 1.3.1 (2021-08-15)
+----------------------------
+
+ * Support for more than one database table query with a statement (See https://github.com/kaiwinter/dummyjdbc/issues/9)
+
 Version 1.3.0 (2018-03-14)
 ----------------------------
 
