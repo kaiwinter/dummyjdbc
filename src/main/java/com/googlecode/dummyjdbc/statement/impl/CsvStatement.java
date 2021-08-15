@@ -22,11 +22,10 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 import com.googlecode.dummyjdbc.resultset.DummyResultSet;
 import com.googlecode.dummyjdbc.resultset.impl.CSVResultSet;
 import com.googlecode.dummyjdbc.statement.StatementAdapter;
+import com.opencsv.CSVReader;
 import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 
 /**
