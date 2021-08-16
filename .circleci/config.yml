@@ -1,0 +1,20 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/openjdk
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: mvn -B -DskipTests clean package
+      - run:
+          name: Test
+          command: mvn test
+
+workflows:
+  sample: 
+    jobs:
+      - build-and-test
