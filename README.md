@@ -12,7 +12,7 @@ For more details please see the [Wiki](https://github.com/kaiwinter/dummyjdbc/wi
 <dependency>
    <groupId>com.googlecode.dummyjdbc</groupId>
    <artifactId>dummyjdbc</artifactId>
-   <version>1.3.0</version>
+   <version>1.3.1</version>
 </dependency>
 ```
 
