@@ -26,6 +26,7 @@ import com.googlecode.dummyjdbc.resultset.DummyResultSet;
 import com.googlecode.dummyjdbc.resultset.impl.CSVResultSet;
 import com.googlecode.dummyjdbc.statement.StatementAdapter;
 import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import com.googlecode.dummyjdbc.resultset.DummyResultSetMetaData;
 
 /**
@@ -164,7 +165,7 @@ public final class CsvStatement extends StatementAdapter {
 			}
 			return new CSVResultSet(tableName, new DummyResultSetMetaData(tableName, header), entries);
 
-		} catch (IOException e) {
+		} catch (IOException | CsvValidationException e) {
 			LOGGER.error("Error while reading data from CSV", e);
 		} finally {
 			if (dummyTableReader != null) {
