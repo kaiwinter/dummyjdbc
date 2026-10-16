@@ -486,10 +486,8 @@ In Boomi the driver runs from a **Custom Library** component that holds three ja
      `mvn package`);
    * [opencsv-2.3.jar](https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3.jar);
    * [aspectjrt-1.9.22.1.jar](https://repo1.maven.org/maven2/org/aspectj/aspectjrt/1.9.22.1/aspectjrt-1.9.22.1.jar).
-2. **Upload them to the Account Libraries** (Settings > Development Resources > Account Libraries, then
-   **Upload a File**). Boomi asks, together with each jar, for a hash file with the SHA-256 of that jar; on Linux, for
-   example, `sha256sum mockjdbc-2.0.1.jar > mockjdbc-2.0.1.jar.sha256`. You need the *Build Read and Write Access* and
-   *Developer* privileges. See [Account Libraries](https://help.boomi.com/docs/Atomsphere/Platform/r-atm-Account_Library_Management_edc37905-b4fe-4cae-8001-b62221adb872)
+2. **Upload them to the Account Libraries** (Settings > Account Libraries, then **Upload a File**). You need the
+   *Build Read and Write Access* and *Developer* privileges. See [Account Libraries](https://help.boomi.com/docs/Atomsphere/Platform/r-atm-Account_Library_Management_edc37905-b4fe-4cae-8001-b62221adb872)
    and [Uploading a custom file](https://help.boomi.com/docs/Atomsphere/Platform/t-atm-Uploading_a_custom_file_1e930859-7d52-4f10-beb5-a18102e6a89a)
    in the Boomi documentation.
    **This step can only be done from the Boomi UI**: the Boomi APIs offer no way to upload a jar to the Account
