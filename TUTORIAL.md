@@ -26,14 +26,12 @@ end.
 
 ## 1. Before you start
 
-Upload to a Custom Library deployed on your runtime (Atom, Molecule, ...):
-
-* the mockjdbc jar (`mockjdbc-<version>.jar`);
-* its dependencies `net.sf.opencsv:opencsv` 2.3 and `org.aspectj:aspectjrt` 1.9.22.1 (`slf4j` is already provided by
-  the Boomi runtime).
-
-See [FEATURES.md, section 11 – Installation](FEATURES.md#installation) for the details, including the procedure to
-follow when you **upgrade** the jar (stop the Atom, delete the old jars, restart).
+mockjdbc must be in a **Custom Library** deployed on the runtime where the test runs, with the jars
+`mockjdbc-<version>.jar`, `opencsv-2.3.jar` and `aspectjrt-1.9.22.1.jar`. Follow
+[Setting up the Custom Library](FEATURES.md#setting-up-the-custom-library) (download, upload, library component,
+deployment); this tutorial uses the Database (Legacy) connector, so choose it as the library connector. When you
+**upgrade** the jar, see [Upgrading the jar](FEATURES.md#upgrading-the-jar) (stop the Atom, delete the old jars,
+restart).
 
 ---
 
@@ -218,7 +216,7 @@ If something does not work:
   `Smith` ([section 4](FEATURES.md#4-different-results-for-different-parameters)).
 * **Database V2 operations** (Standard Get/Insert/Update/Delete, Dynamic Insert, ...): define every table the operation
   uses, even with the header only, so that the connector knows its columns
-  ([installation notes](FEATURES.md#installation)).
+  ([Database V2 operations](FEATURES.md#database-v2-operations)).
 * **Stored procedures**: `EXEC my_proc ?` reads `mockjdbc_my_proc` and captures `mockjdbc_my_proc_PARAMS`.
 
 The editable sources of the pictures of this tutorial are in [`docs/sources`](docs/sources).

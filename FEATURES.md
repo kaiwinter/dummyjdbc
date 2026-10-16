@@ -469,17 +469,55 @@ back by the process.
 
 ### Installation
 
-Use the jar `mockjdbc-<version>.jar` produced by `mvn package` and upload its runtime dependencies to Boomi as well:
+In Boomi the driver runs from a **Custom Library** component that holds three jars:
 
-* `net.sf.opencsv:opencsv` 2.3;
-* `org.aspectj:aspectjrt` 1.9.22.1 (the driver classes are woven with the AspectJ tracing aspect and do not load
-  without it);
-* `org.slf4j:slf4j-api` only if the runtime does not already provide it (the Boomi runtime does).
+* `mockjdbc-<version>.jar`;
+* `opencsv-2.3.jar` (`net.sf.opencsv:opencsv` 2.3);
+* `aspectjrt-1.9.22.1.jar` (`org.aspectj:aspectjrt` 1.9.22.1: the driver classes are woven with the AspectJ tracing
+  aspect and do not load without it).
+
+`org.slf4j:slf4j-api` is needed too, but the Boomi runtime already provides it.
+
+#### Setting up the Custom Library
+
+1. **Download the jars**:
+   * [mockjdbc-2.0.1.jar](https://github.com/SimoneAvogadro/mockjdbc/releases/download/mockjdbc-2.0.1/mockjdbc-2.0.1.jar)
+     (other versions on the [releases](https://github.com/SimoneAvogadro/mockjdbc/releases) page, or build it with
+     `mvn package`);
+   * [opencsv-2.3.jar](https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3.jar);
+   * [aspectjrt-1.9.22.1.jar](https://repo1.maven.org/maven2/org/aspectj/aspectjrt/1.9.22.1/aspectjrt-1.9.22.1.jar).
+2. **Upload them to the Account Libraries** (Settings > Development Resources > Account Libraries, then
+   **Upload a File**). Boomi asks, together with each jar, for a hash file with the SHA-256 of that jar; on Linux, for
+   example, `sha256sum mockjdbc-2.0.1.jar > mockjdbc-2.0.1.jar.sha256`. You need the *Build Read and Write Access* and
+   *Developer* privileges. See [Account Libraries](https://help.boomi.com/docs/Atomsphere/Platform/r-atm-Account_Library_Management_edc37905-b4fe-4cae-8001-b62221adb872)
+   and [Uploading a custom file](https://help.boomi.com/docs/Atomsphere/Platform/t-atm-Uploading_a_custom_file_1e930859-7d52-4f10-beb5-a18102e6a89a)
+   in the Boomi documentation.
+   **This step can only be done from the Boomi UI**: the Boomi APIs offer no way to upload a jar to the Account
+   Libraries.
+3. **Create a Custom Library component** (Build > Create New > Custom Library, see
+   [Creating a Custom Library component](https://help.boomi.com/docs/Atomsphere/Integration/Process%20building/t-atm-Creating_a_Custom_Library_Component_8fce64fb-4b85-4977-9876-e0d616526228)).
+   The name is up to you. Set:
+   * **Custom Library Type**: `Connector` (it cannot be changed later);
+   * **Connector**: the connector used by the connections of the processes you test: `Database (Legacy)` or
+     `Database` (Database V2). If your processes use both connectors, create two libraries, one per connector;
+   * **Included JAR Files**: the three jars uploaded in step 2.
+
+   ![Custom Library component for the Database (Legacy) connector, with aspectjrt-1.9.22.1.jar, mockjdbc-2.0.1.jar and opencsv-2.3.jar](docs/images/boomi-custom-library-legacy.png)
+
+   ![Custom Library component for the Database (V2) connector, labelled "Database", with the same three jars](docs/images/boomi-custom-library-v2.png)
+
+4. **Deploy the library** to every environment (or runtime) where the tests run, as you deploy any other component.
+   It is not needed in production, where the processes use the real driver. After the deployment the jars appear in
+   the Installed Libraries panel of the runtime, under `/userlib/<connector type>`.
+
+#### Driver settings
 
 In the Database connection choose a custom driver with:
 
 * driver class `me.avogadro.mockjdbc.MockJdbcDriver`;
 * connection URL `any` (or `jdbc::mock::<dir>`, see [section 8](#8-several-databases-with-jdbc-urls)).
+
+#### Upgrading the jar
 
 **When you upgrade the jar: stop the Atom, delete the old mockjdbc jars (and the old data jars of the same library),
 then start the Atom again.** This is needed with both Database connectors:
@@ -491,6 +529,8 @@ then start the Atom again.** This is needed with both Database connectors:
 * **Legacy Database connector** (`userlib\database`): the procedure is needed **even when no file is locked**. When a jar
   leaves the library, Boomi does not add it to `ignored_jars.txt` of that folder, so the old jar stays on the legacy
   classpath (it can hide the new one) and the cleanup does not even try to delete it.
+
+#### Database V2 operations
 
 The Database V2 connector reads the connection metadata before running queries
 (see [section 10](#10-resolution-order-and-good-to-know)). For the operations it builds from the table definition

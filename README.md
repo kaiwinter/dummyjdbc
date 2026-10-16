@@ -61,14 +61,14 @@ assertEquals("3,Anna", MockJdbcDriver.getInMemoryTableResource("users_PARAMS"));
 
 ## Installation
 
-* **Jar**: download it from the [releases](https://github.com/SimoneAvogadro/mockjdbc/releases), or build it with
-  `mvn package` (`target/mockjdbc-<version>.jar`; Java 8 bytecode).
-* **Runtime dependencies**: `net.sf.opencsv:opencsv` 2.3, `org.aspectj:aspectjrt` 1.9.22.1 and `org.slf4j:slf4j-api`
-  (already provided by the Boomi runtime).
+* **Jars**: `mockjdbc-<version>.jar` from the [releases](https://github.com/SimoneAvogadro/mockjdbc/releases) (or
+  `mvn package`, Java 8 bytecode) and its runtime dependencies `net.sf.opencsv:opencsv` 2.3 and
+  `org.aspectj:aspectjrt` 1.9.22.1 (`org.slf4j:slf4j-api` is already provided by the Boomi runtime).
 * **Driver**: class `me.avogadro.mockjdbc.MockJdbcDriver`, JDBC URL `any` (or `jdbc::mock::<dir>`).
 
-In Boomi, upload the jar and its dependencies to a Custom Library; when you upgrade, stop the Atom, delete the old jars
-and restart it ([details](FEATURES.md#installation)).
+In Boomi the jars go in a Custom Library deployed where the tests run: follow
+[Setting up the Custom Library](FEATURES.md#setting-up-the-custom-library) (download links, upload, library
+component, deployment) and, when you upgrade, [Upgrading the jar](FEATURES.md#upgrading-the-jar).
 
 ## Documentation
 
