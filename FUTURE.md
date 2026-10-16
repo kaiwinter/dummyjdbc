@@ -99,9 +99,9 @@ implemented yet**. Each item says what is missing today and what a change would 
 
 ## Documentation
 
-### 11. Slimmer README
+### 11. Publication on Maven Central
 
-* **Today:** the README links to `FEATURES.md`, but its older sections ("New Methods in 1.4.0", "1.5.0", sample usage)
-  partly duplicate it, and it still refers to the old Maven coordinates and the upstream wiki.
-* **Idea:** shrink the README to an overview plus links, keep the detailed behaviour in `FEATURES.md`, and update the
-  dependency snippet to the `me.avogadro` coordinates once a release is published.
+* **Today:** no artifact is published on Maven: the jar comes from the GitHub releases or from `mvn package`, and the
+  docs deliberately describe only that.
+* **Idea:** when a release is published (coordinates `me.avogadro.mockjdbc:mockjdbc`, as in `pom.xml`), add the Maven /
+  Gradle dependency snippet back to the README "Installation" section and to FEATURES.md section 1.

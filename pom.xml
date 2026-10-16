@@ -9,7 +9,7 @@
 	<description>
 		MockJDBC (formerly DummyJDBC) is a mock JDBC driver which can return data from CSV files 
 	</description>
-	<url>https://github.com/SimoneAvogadro/dummyjdbc</url>
+	<url>https://github.com/SimoneAvogadro/mockjdbc</url>
 	<licenses>
 		<license>
 			<name>Apache 2</name>
@@ -19,9 +19,9 @@
 	</licenses>
 
 	<scm>
-		<url>https://github.com/SimoneAvogadro/dummyjdbc</url>
-		<connection>scm:git:https://github.com/SimoneAvogadro/dummyjdbc.git</connection>
-		<developerConnection>scm:git:git@github.com:SimoneAvogadro/dummyjdbc.git</developerConnection>
+		<url>https://github.com/SimoneAvogadro/mockjdbc</url>
+		<connection>scm:git:https://github.com/SimoneAvogadro/mockjdbc.git</connection>
+		<developerConnection>scm:git:git@github.com:SimoneAvogadro/mockjdbc.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -37,7 +37,7 @@
 
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/SimoneAvogadro/dummyjdbc/issues</url>
+		<url>https://github.com/SimoneAvogadro/mockjdbc/issues</url>
 	</issueManagement>
 
 	<properties>

@@ -1,8 +1,8 @@
 # mockjdbc
-[![CircleCI](https://circleci.com/gh/SimoneAvogadro/dummyjdbc.svg?style=svg)](https://circleci.com/gh/SimoneAvogadro/dummyjdbc)
+[![CircleCI](https://circleci.com/gh/SimoneAvogadro/mockjdbc.svg?style=svg)](https://circleci.com/gh/SimoneAvogadro/mockjdbc)
 
 > **mockjdbc** is the new name of this fork of [dummyjdbc](https://github.com/kaiwinter/dummyjdbc), the original project
-> by Kai Winter. The GitHub repository still keeps its old name for now.
+> by Kai Winter.
 
 **Current version: 2.0.1** – see the [CHANGELOG](CHANGELOG.md).
 
@@ -61,9 +61,8 @@ assertEquals("3,Anna", MockJdbcDriver.getInMemoryTableResource("users_PARAMS"));
 
 ## Installation
 
-* **Jar**: download it from the [releases](https://github.com/SimoneAvogadro/dummyjdbc/releases), or build it with
-  `mvn package` (`target/mockjdbc-<version>.jar`; Java 8 bytecode). The Maven coordinates are
-  `me.avogadro.mockjdbc:mockjdbc` (not published on Maven Central: use `mvn install` for a local repository).
+* **Jar**: download it from the [releases](https://github.com/SimoneAvogadro/mockjdbc/releases), or build it with
+  `mvn package` (`target/mockjdbc-<version>.jar`; Java 8 bytecode).
 * **Runtime dependencies**: `net.sf.opencsv:opencsv` 2.3, `org.aspectj:aspectjrt` 1.9.22.1 and `org.slf4j:slf4j-api`
   (already provided by the Boomi runtime).
 * **Driver**: class `me.avogadro.mockjdbc.MockJdbcDriver`, JDBC URL `any` (or `jdbc::mock::<dir>`).

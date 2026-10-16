@@ -25,8 +25,8 @@ This guide starts from the simplest case and builds up.
 
 ## 1. Setup
 
-Add the dependency (see the README for the current coordinates) and make sure the driver class
-is loaded; it registers itself with `DriverManager` on load:
+Put the jar and its runtime dependencies on the classpath (see [Installation](README.md#installation)) and make sure
+the driver class is loaded; it registers itself with `DriverManager` on load:
 
 ```java
 Class.forName(MockJdbcDriver.class.getCanonicalName());
