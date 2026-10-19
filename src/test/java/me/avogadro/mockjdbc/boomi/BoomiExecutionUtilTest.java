@@ -114,6 +114,23 @@ public final class BoomiExecutionUtilTest {
 		Assert.assertEquals("bob", FakeExecutionUtil.PROPERTIES.get("mockjdbc_t_014a_params"));
 	}
 
+	@Test
+	public void testQueryIdReadsAndWritesDynamicProcessProperties() throws Exception {
+		BoomiExecutionUtil.lookup(FakeExecutionUtil.class.getName());
+
+		FakeExecutionUtil.PROPERTIES.put("mockjdbc_ecommerce.create-order-ws.select-customer", "name\nACME");
+		ResultSet resultSet = DriverManager.getConnection("any").createStatement()
+				.executeQuery("-- QUERY_ID: ecommerce.create-order-ws.select-customer\nSELECT * FROM customers");
+		Assert.assertTrue(resultSet.next());
+		Assert.assertEquals("ACME", resultSet.getString("name"));
+
+		PreparedStatement statement = DriverManager.getConnection("any")
+				.prepareStatement("-- QUERY_ID: ecommerce.create-order-ws.insert-order\nINSERT INTO orders (id) VALUES (?)");
+		statement.setString(1, "1001");
+		statement.executeUpdate();
+		Assert.assertEquals("1001", FakeExecutionUtil.PROPERTIES.get("mockjdbc_ecommerce.create-order-ws.insert-order_params"));
+	}
+
 	/** runs a query selected by an explicit test case and returns the value of its NAME column, as "name\n<value>" */
 	private static String queryTestCase(String testCase) throws Exception {
 		ResultSet resultSet = DriverManager.getConnection("any").createStatement()

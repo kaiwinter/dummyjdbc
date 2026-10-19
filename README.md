@@ -50,7 +50,7 @@ assertEquals("3,Anna", MockJdbcDriver.getInMemoryTableResource("users_PARAMS"));
 
 * **Datasets in memory or on file**: CSV strings, `InputStream`s, files, a `/tables/` folder on the classpath (also inside
   a jar) or a directory per database (`jdbc::mock::<dir>`) – [sections 2, 7, 8](FEATURES.md#2-quick-start-in-memory-dataset).
-* **Flexible matching**: by table name, by an explicit `-- TESTCASE:` comment, by stored procedure name, by query
+* **Flexible matching**: by table name, by an explicit `-- QUERY_ID:` comment, by stored procedure name, by query
   parameters (`users?Smith`), by execution step, and by repetition (`users#1`, `users#2`) –
   [sections 3–5](FEATURES.md#3-how-a-query-finds-its-dataset).
 * **Captured writes**: parameters of INSERT, UPDATE, DELETE and procedure calls, also in batches –

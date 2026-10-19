@@ -37,10 +37,10 @@ public final class MockDatabaseMetaDataTest {
 	public void testDescriptiveValues() throws SQLException {
 		Assert.assertEquals("MockJDBC", metaData.getDatabaseProductName());
 		Assert.assertEquals("MockJDBC", metaData.getDriverName());
-		Assert.assertEquals("2.0", metaData.getDriverVersion());
-		Assert.assertEquals("2.0", metaData.getDatabaseProductVersion());
+		Assert.assertEquals("2.1", metaData.getDriverVersion());
+		Assert.assertEquals("2.1", metaData.getDatabaseProductVersion());
 		Assert.assertEquals(2, metaData.getDriverMajorVersion());
-		Assert.assertEquals(0, metaData.getDriverMinorVersion());
+		Assert.assertEquals(1, metaData.getDriverMinorVersion());
 		Assert.assertEquals("any", metaData.getURL());
 		Assert.assertEquals("", metaData.getUserName());
 		Assert.assertEquals(" ", metaData.getIdentifierQuoteString());

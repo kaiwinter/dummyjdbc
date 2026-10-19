@@ -58,7 +58,7 @@ implemented yet**. Each item says what is missing today and what a change would 
 ### 7. Table-name detection for INSERT/UPDATE/DELETE
 
 * **Today:** the table of an `INSERT INTO <table> (` / `UPDATE <table>` is matched with letters only (`[a-zA-Z]`), so names
-  containing digits or underscores (`user_roles`, `table2`) are not captured under `<table>_PARAMS`; a `-- TESTCASE:` comment
+  containing digits or underscores (`user_roles`, `table2`) are not captured under `<table>_PARAMS`; a `-- QUERY_ID:` comment
   is needed.
 * **Idea:** accept `[A-Za-z0-9_$.]` (and schema-qualified names), with tests for each form.
 

@@ -198,7 +198,7 @@ If something does not work:
   before path 2.
 * **`mockjdbc_users_PARAMS` is empty**: check that the statement is an INSERT, UPDATE, DELETE or stored procedure call
   on `users` (SELECT parameters are never captured), and that the table name contains only letters (otherwise use a
-  `-- TESTCASE:` comment, see [FEATURES.md, section 6](FEATURES.md#6-capturing-statement-parameters)).
+  `-- QUERY_ID:` comment, see [FEATURES.md, section 6](FEATURES.md#6-capturing-statement-parameters)).
 * **The driver class is not found, or an old behaviour persists**: make sure the Custom Library contains the current
   jar only (see [Before you start](#1-before-you-start)). At startup the driver writes
   `MockJDBC <version> registered in DriverManager: false` in the container log.

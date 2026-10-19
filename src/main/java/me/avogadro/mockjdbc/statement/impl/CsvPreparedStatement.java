@@ -81,7 +81,7 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	 * Always reply that 1 row was affected (most common case) if we can identify the target table name
 	 * otherwise return 0.
 	 * The parameters are captured as <code>&lt;name&gt;_PARAMS</code> for every statement except SELECTs
-	 * (INSERT, UPDATE, DELETE, stored procedure calls, statements with a TESTCASE comment or a step resource).
+	 * (INSERT, UPDATE, DELETE, stored procedure calls, statements with a QUERY_ID or TESTCASE comment or a step resource).
 	 */
 	@Override
 	public int executeUpdate(String sql) throws SQLException {
@@ -108,9 +108,9 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 			}
 
 			// Try to check for a special heading comment within SQL
-			String testCase = CsvStatement.matchTestCase(sql);
-			if (testCase != null) {
-				targetTable4Updates = testCase;
+			String queryId = CsvStatement.matchQueryId(sql);
+			if (queryId != null) {
+				targetTable4Updates = queryId;
 				return res;
 			}
 			

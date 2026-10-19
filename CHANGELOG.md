@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+Version 2.1.0 (2026-10-19)
+----------------------------
+
+ * `-- QUERY_ID: name` as the first line of a statement names the query: its dataset is `name`, its captured parameters
+   `name_PARAMS` and its counter is its own, whatever the table. The ID is one word: an empty ID, or one with spaces,
+   `?`, `#` or `,`, makes the statement fail with an `SQLException`. Recommended over `-- TESTCASE: name`, which still
+   works as before
+ * Documentation: best practice "an ID for every query" (`<project>.<service>.<step>`) in FEATURES.md
+
 Version 2.0.1 (2026-10-09)
 ----------------------------
 

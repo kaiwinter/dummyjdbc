@@ -45,7 +45,10 @@ public final class CsvStatement extends StatementAdapter {
 	 * Pattern used to recognize explicitly declared table names inside an heading comment.
 	 * The name stops at the end of the first line (\n or \r\n), whatever follows on the next lines.
 	 */
-	private static final Pattern COMMENT_HEADLINE_PATTERN = Pattern.compile("\\s*--\\s*TESTCASE:[ \\t]*([^\\r\\n]*)\\r?\\n.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	private static final Pattern COMMENT_HEADLINE_PATTERN = Pattern.compile("\\s*--\\s*(QUERY_ID|TESTCASE):[ \\t]*([^\\r\\n]*)\\r?\\n.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+	/** A valid QUERY_ID: no spaces and none of the separators of the lookup names (<code>?</code>, <code>#</code>, <code>,</code>). */
+	private static final Pattern QUERY_ID_PATTERN = Pattern.compile("[^\\s?#,]+");
 	
 	/** Pattern to get table name from an SQL statement. */
 	private static final Pattern TABLENAME_PATTERN = Pattern.compile(".*from\\s*(\\S*)\\s?.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL );
@@ -163,9 +166,9 @@ public final class CsvStatement extends StatementAdapter {
 			}
 						
 			// Try to check for a special heading comment within SQL
-			String testCase = matchTestCase(sql);
-			if (testCase != null) {
-				return createResultSet(testCase);
+			String queryId = matchQueryId(sql);
+			if (queryId != null) {
+				return createResultSet(queryId);
 			}
 			
 			// Try to interpret SQL as a SELECT on a table
@@ -203,13 +206,22 @@ public final class CsvStatement extends StatementAdapter {
 	
 	/**
 	 * @param sql the SQL text
-	 * @return the name declared by a heading <code>-- TESTCASE: name</code> comment (trimmed), or <code>null</code>
+	 * @return the name declared by a heading <code>-- QUERY_ID: name</code> or <code>-- TESTCASE: name</code> comment
+	 *         (trimmed), or <code>null</code>
+	 * @throws SQLException if the QUERY_ID is empty or contains spaces, <code>?</code>, <code>#</code> or <code>,</code>
 	 */
-	static String matchTestCase(String sql) {
+	static String matchQueryId(String sql) throws SQLException {
 		Matcher commentMatcher = COMMENT_HEADLINE_PATTERN.matcher(sql);
 		if (commentMatcher.matches()) {
-			String testCase = commentMatcher.group(1).trim();
-			return testCase.isEmpty() ? null : testCase;
+			String name = commentMatcher.group(2).trim();
+			if ("QUERY_ID".equalsIgnoreCase(commentMatcher.group(1))) {
+				if (!QUERY_ID_PATTERN.matcher(name).matches()) {
+					throw new SQLException("Invalid QUERY_ID '" + name
+							+ "': it must be one word without spaces, '?', '#' or ','");
+				}
+				return name;
+			}
+			return name.isEmpty() ? null : name;
 		}
 		return null;
 	}
