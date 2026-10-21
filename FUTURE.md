@@ -17,11 +17,11 @@ implemented yet**. Each item says what is missing today and what a change would 
 
 ### 2. ISO-style default formats
 
-* **Today:** the defaults are `dd-MMM-yy`, `HH:mm`, `yyyyMMdd HHmmss.SSS`. The date format depends on the JVM
-  locale, the time default drops seconds, and the timestamp default requires milliseconds. Users have to call
-  `setDateFormat` / `setTimeFormat` / `setTimestampFormat` in every thread.
+* **Today:** the defaults are `dd-MMM-yy`, `HH:mm`, `yyyyMMdd HHmmss.SSS`. Month names are always English
+  (`Locale.ENGLISH`, whatever the JVM locale), but the time default drops seconds, and the timestamp default requires
+  milliseconds. Users have to call `setDateFormat` / `setTimeFormat` / `setTimestampFormat` in every thread.
 * **Idea:** default to ISO patterns (`yyyy-MM-dd`, `HH:mm:ss`, `yyyy-MM-dd HH:mm:ss[.SSS]`), possibly accepting several
-  patterns per getter, and use a fixed locale for month names.
+  patterns per getter.
 * **Compatibility:** breaking for existing CSVs and `?params` keys that use the current formats; consider a major version
   or a switch to select the old behaviour.
 
