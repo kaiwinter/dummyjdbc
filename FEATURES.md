@@ -81,11 +81,32 @@ Three ways to select it:
 
 ### a) Table name deduction (default)
 
-The name is taken from the word after `FROM`:
+The name is taken from the table after the **first `FROM` outside any parenthesis**:
 
 ```sql
 SELECT name FROM mytable WHERE surname = 'Happy'   -- resource: mytable
+SELECT * FROM orders WHERE id IN (SELECT id FROM blocked)          -- resource: orders
+SELECT EXTRACT(YEAR FROM d), (SELECT max(x) FROM t2) FROM orders   -- resource: orders
+SELECT * FROM orders o JOIN customers c ON o.cid = c.id            -- resource: orders
+SELECT * FROM (SELECT id FROM orders) o                            -- resource: orders (inside the derived table)
+WITH x AS (SELECT * FROM orders) SELECT * FROM x                   -- resource: x (the CTE name)
 ```
+
+Strings, comments and quoted names are skipped, so `'from x'`, `-- from here` or a column `created_from` are never
+taken for the `FROM`.
+
+**Table names** (the same rule for SELECT, INSERT, UPDATE and DELETE):
+
+* letters, digits, `_` and `$` (`user_roles`, `table2`);
+* quoted with `[...]`, `"..."` or `` `...` ``: `[customers]` gives `customers`;
+* schema-qualified, up to 4 parts: `dbo.customers`, `[dbo].[customers]`, `"dbo"."customers"` and `[dbo.customers]`
+  all give `dbo.customers`.
+
+A qualified name looks for the **full name first, then the last part**: `FROM dbo.customers` uses the `dbo.customers`
+resource (any of its forms, `#n`, `?params`, file) and, if there is none, `customers`, with the same occurrence number.
+
+Not recognised (use a `-- QUERY_ID:` comment): temporary tables `#tmp`, table variables `@rows`, and quoted names with
+spaces, `?`, `#` or `,` (`[order details]`).
 
 ### b) Explicit `-- QUERY_ID:` comment (recommended)
 
@@ -251,10 +272,11 @@ Assert.assertEquals("hello,30", params);
 ```
 
 * `executeUpdate` reports **1 affected row** when the table is recognised, `0` otherwise.
-* The statement can span several lines (`\n` or `\r\n`) and can start with a `--` comment line.
+* The statement can span several lines (`\n` or `\r\n`) and can start with `--` or `/* */` comments.
 * With an explicit `-- QUERY_ID: name` (or `-- TESTCASE: name`) comment the key is `name_PARAMS`.
-* The table name in `INSERT INTO <table> (` / `UPDATE <table>` / `DELETE FROM <table>` is matched with letters only (`[a-zA-Z]`),
-  so names with digits or underscores are not captured by name – use a `-- QUERY_ID:` comment for those.
+* The table of `INSERT [INTO] <table>` (with or without the column list), `UPDATE <table>` and
+  `DELETE [FROM] <table>` follows the [table name rule](#a-table-name-deduction-default). The key uses the **full name**:
+  `INSERT INTO [dbo].[utenti] ...` gives `dbo.utenti_PARAMS` (not `utenti_PARAMS`).
 * `<name>_PARAMS` always holds the **latest** parameters (the common single-write test). Every write is also kept as
   `<name>_PARAMS#n`, numbered with the counter of the name
   ([repeated use](#repeated-use-of-the-same-resource-users1-users2)): two INSERTs into `users` give
@@ -453,7 +475,7 @@ For each executed query the driver tries, in this order:
 
 1. **Step resource** for the current step ([section 5](#5-step-based-results-a-scripted-sequence)).
 2. **`-- QUERY_ID: name`** (or `-- TESTCASE: name`) comment.
-3. **Table name** after `FROM`.
+3. **Table name** after the first `FROM` outside parentheses (full name, then its last part).
 4. **Stored procedure** name after `EXEC`/`EXECUTE`.
 5. **Pure `SELECT`** without a table: one row with value `1`.
 6. Otherwise an empty result set.
@@ -564,6 +586,10 @@ according to the column type, so:
   `mockjdbc_payments` = `id|integer, amount|double, note` (use the `|type` to get numbers bound as numbers);
 * **every field of the input document must be a column of that header**: once the column types are known the connector
   fails (NullPointerException) on a field that has no matching column.
+* **a query with `IN (...)` needs the IN clause option** of the operation, also for a subquery
+  (`WHERE id NOT IN (SELECT ...)`): without it the connector itself rejects the query, before the driver sees it, with
+  error 405 `Kindly select the IN clause check box only if Sql Query contains IN Clause !` (the output document holds
+  the error). A `NOT EXISTS (SELECT ...)` subquery needs no option.
 
 ### Detection
 

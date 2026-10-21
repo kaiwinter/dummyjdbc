@@ -197,8 +197,9 @@ If something does not work:
 * **The process reads no rows**: check the property name (`mockjdbc_` + table name, lower case) and that path 1 runs
   before path 2.
 * **`mockjdbc_users_PARAMS` is empty**: check that the statement is an INSERT, UPDATE, DELETE or stored procedure call
-  on `users` (SELECT parameters are never captured), and that the table name contains only letters (otherwise use a
-  `-- QUERY_ID:` comment, see [FEATURES.md, section 6](FEATURES.md#6-capturing-statement-parameters)).
+  on `users` (SELECT parameters are never captured). A schema-qualified table uses the full name
+  (`mockjdbc_dbo.users_PARAMS`); temporary tables (`#tmp`) and quoted names with spaces need a `-- QUERY_ID:` comment,
+  see [FEATURES.md, section 6](FEATURES.md#6-capturing-statement-parameters).
 * **The driver class is not found, or an old behaviour persists**: make sure the Custom Library contains the current
   jar only (see [Before you start](#1-before-you-start)). At startup the driver writes
   `MockJDBC <version> registered in DriverManager: false` in the container log.

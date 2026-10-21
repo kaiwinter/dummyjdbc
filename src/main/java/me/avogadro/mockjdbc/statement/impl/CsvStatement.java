@@ -51,9 +51,6 @@ public final class CsvStatement extends StatementAdapter {
 	/** A valid QUERY_ID: no spaces and none of the separators of the lookup names (<code>?</code>, <code>#</code>, <code>,</code>). */
 	private static final Pattern QUERY_ID_PATTERN = Pattern.compile("[^\\s?#,]+");
 	
-	/** Pattern to get table name from an SQL statement. */
-	private static final Pattern TABLENAME_PATTERN = Pattern.compile(".*from\\s*(\\S*)\\s?.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL );
-
 	/** Pattern to get the name of a stored procedure from an SQL statement. */
 	private static final Pattern STORED_PROCEDURE_PATTERN = Pattern.compile(".*(EXEC|EXECUTE) (\\S*)\\s?.*",	Pattern.CASE_INSENSITIVE);
 
@@ -173,10 +170,9 @@ public final class CsvStatement extends StatementAdapter {
 			}
 			
 			// Try to interpret SQL as a SELECT on a table
-			Matcher tableMatcher = TABLENAME_PATTERN.matcher(sql);
-			if (tableMatcher.matches()) {
-				String tableName = tableMatcher.group(1);
-				return createResultSet(tableName);
+			String tableName = SqlNames.selectTable(sql);
+			if (tableName != null) {
+				return createTableResultSet(tableName);
 			}
 
 			// Try to interpret SQL as call of a stored procedure
@@ -236,20 +232,30 @@ public final class CsvStatement extends StatementAdapter {
 		return procedureMatcher.matches() ? procedureMatcher.group(1) : null;
 	}
 
-	static String matchTablename(String sql) {
-		Matcher tableMatcher = TABLENAME_PATTERN.matcher(sql);
-		if (tableMatcher.matches()) {
-			return tableMatcher.group(1);
-		} else {
-			return null;
-		}
-	}
-
 	/** a query on a named resource (table, test case, procedure): counts one more occurrence of that name */
 	private ResultSet createResultSet(String tableName) {
 		lastOccurrenceName = tableName;
 		lastOccurrence = MockJdbcDriver.nextOccurrence(tableName);
 		return createResultSet(tableResources, tableName, paramsString, lastOccurrence);
+	}
+
+	/**
+	 * a query on a table: the full name first (<code>dbo.customers</code>), then its last part (<code>customers</code>)
+	 * with the same occurrence number, counted on the full name
+	 */
+	private ResultSet createTableResultSet(String tableName) {
+		lastOccurrenceName = tableName;
+		lastOccurrence = MockJdbcDriver.nextOccurrence(tableName);
+		ResultSet resultSet = findResultSet(tableResources, tableName, paramsString, lastOccurrence);
+		String shortName = SqlNames.lastPart(tableName);
+		if (resultSet == null && shortName != null) {
+			resultSet = findResultSet(tableResources, shortName, paramsString, lastOccurrence);
+		}
+		if (resultSet == null) {
+			LOGGER.info("No table definition found for '{}', using MockResultSet.", tableName);
+			return new MockResultSet();
+		}
+		return resultSet;
 	}
 
 	/**
@@ -269,6 +275,20 @@ public final class CsvStatement extends StatementAdapter {
 	 * @param occurrence how many times the resource name has been used (1 = first), 0 = not counted
 	 */
 	private static ResultSet createResultSet(Map<String, File> tableResources, String tableName, String paramsString,
+			int occurrence) {
+		ResultSet resultSet = findResultSet(tableResources, tableName, paramsString, occurrence);
+		if (resultSet == null) {
+			LOGGER.info("No table definition found for '{}', using MockResultSet.", tableName);
+			return new MockResultSet();
+		}
+		return resultSet;
+	}
+
+	/**
+	 * @return the data of the resource, or <code>null</code> if no in-memory resource, file or classpath resource has
+	 *         that name
+	 */
+	private static ResultSet findResultSet(Map<String, File> tableResources, String tableName, String paramsString,
 			int occurrence) {
 		Reader inMemoryReader = null;
 		String inMemoryCSV = null;
@@ -301,8 +321,7 @@ public final class CsvStatement extends StatementAdapter {
 			// Try to load /tables/<name>.csv from the classpath: a directory or a jar
 			URL url = CsvStatement.class.getResource("/tables/" + tableName.toLowerCase(Locale.ROOT) + ".csv");
 			if (url == null) {
-				LOGGER.info("No table definition found for '{}', using MockResultSet.", tableName);
-				return new MockResultSet();
+				return null;
 			} else if ("file".equalsIgnoreCase(url.getProtocol())) {
 				try {
 					resource = new File(url.toURI());

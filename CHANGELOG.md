@@ -4,6 +4,17 @@ Change Log
 Unreleased
 ----------------------------
 
+ * Behaviour change: the table of a query is the one after the **first** `FROM` outside parentheses. Before, it was
+   the word after the last `from` in the text: `SELECT * FROM orders WHERE id IN (SELECT id FROM blocked)` used
+   `blocked)`, now `orders`. Strings, comments and quoted names are skipped (`'from x'`, `created_from`), and
+   `FROM (SELECT ... FROM t)` uses `t`
+ * Table names follow one rule for SELECT, INSERT, UPDATE and DELETE: letters, digits, `_`, `$`; quoted with `[]`,
+   `""` or backticks; schema-qualified (`dbo.users`, `[dbo].[users]`, `[dbo.users]` all give `dbo.users`). Reads look
+   for the full name first, then the last part (`dbo.users`, then `users`); writes capture `<full name>_PARAMS`.
+   `INSERT INTO t VALUES (...)` without a column list and `INSERT t ...` without `INTO` are captured too. Before,
+   INSERT/UPDATE/DELETE accepted letters only, and `FROM [users]` looked for `[users]`. Temporary tables (`#tmp`),
+   table variables and quoted names with spaces, `?`, `#` or `,` still need a `-- QUERY_ID:` comment
+
  * Behaviour change: the month and day names of the date, time and timestamp formats (`dd-MMM-yy`, `HH:mm`,
    `yyyyMMdd HHmmss.SSS`, and the patterns set with `setDateFormat` / `setTimeFormat` / `setTimestampFormat`) are parsed
    and formatted with `Locale.ENGLISH`, whatever the locale of the machine or of the JVM. Before, `dd-MMM-yy` read

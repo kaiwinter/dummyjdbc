@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.avogadro.mockjdbc.MockJdbcDriver;
@@ -23,15 +22,6 @@ import me.avogadro.mockjdbc.statement.PreparedStatementAdapter;
  * @author Kai Winter
  */
 public class CsvPreparedStatement extends PreparedStatementAdapter {
-
-	/** INSERT INTO table ( ... possibly on several lines, optionally after a comment line */
-	private static final Pattern INSERT_INTO_PATTERN = Pattern.compile("(?:--[^\\n]*)?\\s*insert\\s*into\\s*([a-zA-Z]*)\\s*\\(.*", Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
-
-	/** UPDATE table ... possibly on several lines, optionally after a comment line; the name must be followed by whitespace */
-	private static final Pattern UPDATE_TABLE_PATTERN = Pattern.compile("(?:--[^\\n]*)?\\s*update\\s+([a-zA-Z]+)(?:\\s.*)?", Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
-
-	/** DELETE [FROM] table ... possibly on several lines, optionally after a comment line */
-	private static final Pattern DELETE_TABLE_PATTERN = Pattern.compile("(?:--[^\\n]*)?\\s*delete\\s+(?:from\\s+)?([a-zA-Z]+)(?:\\s.*)?", Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
 
 	/** SELECT statement, after optional comment lines: its parameters are not captured */
 	private static final Pattern SELECT_PATTERN = Pattern.compile("(?:\\s*--[^\\n]*\\n)*[\\s(]*select\\b.*", Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
@@ -114,23 +104,10 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 				return res;
 			}
 			
-			// Try to interpret SQL as a SELECT on a table
-			Matcher insertMatcher = INSERT_INTO_PATTERN.matcher(sql);
-			if (insertMatcher.matches()) {
-				targetTable4Updates = insertMatcher.group(1);
-				return res;
-			}
-	
-			// Try to interpret SQL as call of a stored procedure
-			Matcher updateMatcher = UPDATE_TABLE_PATTERN.matcher(sql);
-			if (updateMatcher.matches()) {
-				targetTable4Updates = updateMatcher.group(1);
-				return res;
-			}
-
-			Matcher deleteMatcher = DELETE_TABLE_PATTERN.matcher(sql);
-			if (deleteMatcher.matches()) {
-				targetTable4Updates = deleteMatcher.group(1);
+			// Try to interpret SQL as an INSERT, UPDATE or DELETE on a table (full name: dbo.users_PARAMS)
+			String table = SqlNames.writeTable(sql);
+			if (table != null) {
+				targetTable4Updates = table;
 				return res;
 			}
 

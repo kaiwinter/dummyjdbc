@@ -48,15 +48,6 @@ public final class QueryPatternsTest {
 	}
 
 	@Test
-	public void testUpdateOfTableWithUnsupportedNameIsNotCapturedUnderAWrongName() throws SQLException {
-		PreparedStatement statement = connection.prepareStatement("UPDATE user_roles SET role = ?");
-		statement.setString(1, "admin");
-
-		Assert.assertEquals(0, statement.executeUpdate());
-		Assert.assertNull(MockJdbcDriver.getInMemoryTableResource("user_PARAMS"));
-	}
-
-	@Test
 	public void testInsertOnSeveralLinesIsCaptured() throws SQLException {
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO orders (a, b)\nVALUES (?, ?)");
 		statement.setString(1, "x");

@@ -48,6 +48,10 @@ implemented yet**. Each item says what is missing today and what a change would 
   `createStatement` with `EXEC`, `EXECUTE`, `CALL` or `{call ...}`.
 * **Idea:** return a `CallableStatement` built on `CsvPreparedStatement` (same lookup and parameter capture), with OUT
   parameters registered and read back from the CSV result or from dedicated resources.
+* **Impact on Boomi unit tests:** a subprocess that calls a procedure through a "Stored Procedure" operation cannot be
+  unit tested with mockjdbc today, unless the procedure is called from a SQL operation (`EXEC` / `{call ...}`), which
+  means changing the process under test. Seen while writing the `boomi-unit-testing` skill (2026-10-21); which
+  Legacy and Database V2 operation types go through `prepareCall` is still to be confirmed with a run.
 
 ### 6. Database directories loaded lazily
 
@@ -57,24 +61,16 @@ implemented yet**. Each item says what is missing today and what a change would 
 
 ### 7. Table-name detection
 
-* **Today (INSERT/UPDATE/DELETE):** the table of an `INSERT INTO <table> (` / `UPDATE <table>` / `DELETE [FROM] <table>`
-  is matched with letters only (`[a-zA-Z]`), so these are not captured under `<table>_PARAMS` and need a
-  `-- QUERY_ID:` comment (or a step resource):
-  * names containing digits or underscores (`user_roles`, `table2`);
-  * schema-qualified names (`dbo.orders`);
-  * quoted identifiers (`[orders]`, `"orders"`, `` `orders` ``);
-  * `INSERT INTO orders VALUES (...)` without a column list (the pattern wants `(` right after the name).
-* **Today (SELECT):** `TABLENAME_PATTERN` (`.*from\s*(\S*)\s?.*`) is greedy, so the name is the word after the **last**
-  `from` of the whole SQL: `... WHERE id IN (SELECT id FROM blocked)` gives `blocked)`, and a column such as
-  `created_from = ?` after the real `FROM` probably gives `=` (to confirm with a test). `FROM dbo.customers` gives
-  `dbo.customers`, `FROM [customers]` gives `[customers]`.
-* **Idea:** one shared identifier rule for reads and writes: `[A-Za-z0-9_$]` parts, optionally quoted with `[]`, `""`
-  or backticks, optionally schema-qualified (resource name = the last part, lower case, or the full name as a fallback);
-  for SELECT, the first `FROM` at nesting level 0 and a word boundary before `from`; INSERT with or without the column
-  list. Tests for each form. Seen while writing the `boomi-unit-testing` skill (2026-10-21): with mockjdbc as the
-  driver, the Boomi Database V2 Dynamic Insert generates `Insert into payments(pay_id,amount) values (?,?)` (no schema
-  even with `schemaName` set, no quotes), so the generated SQL is already captured; the limits above hit the SQL
-  written by hand in Legacy and V2 operations.
+The shared identifier rule (digits, `_`, quotes, schema-qualified names, first `FROM` outside parentheses, INSERT
+without a column list) is done (`SqlNames`, see FEATURES.md section 3a). Still not recognised, so they need a
+`-- QUERY_ID:` comment:
+
+* **Today:** T-SQL forms with a word between the keyword and the table: `UPDATE TOP (10) t` (gives `TOP`),
+  `DELETE TOP (5) FROM t`; `MERGE INTO t`;
+  `UPDATE ... FROM` with an alias (`UPDATE o SET ... FROM orders o`, gives the alias `o`); temporary tables (`#tmp`) and
+  quoted names with spaces (`[order details]`).
+* **Idea:** skip `TOP (n)` / `TOP n [PERCENT]`, add MERGE; for `#tmp` and spaces, decide a resource-name mapping
+  (`#` and spaces clash with the `#n` occurrence and the lookup separators).
 
 ### 8. Precedence between files and in-memory resources
 

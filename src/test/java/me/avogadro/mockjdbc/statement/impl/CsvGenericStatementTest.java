@@ -122,17 +122,5 @@ public final class CsvGenericStatementTest {
 
 		Assert.fail("Expected exception not thrown");
 	}
-	
-	
-	@Test
-	public void testMatchTablename() {
-		String query = "SELECT *\n"
-				+ "FROM TEST1\n"
-				+ "WHERE age= ? AND other = ?";
-		Assert.assertEquals(
-				"TEST1",
-				CsvStatement.matchTablename(query)
-			);
-	}
-	
+
 }
