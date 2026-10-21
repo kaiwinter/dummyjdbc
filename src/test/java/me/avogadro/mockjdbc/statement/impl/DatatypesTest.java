@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
-import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,7 +76,6 @@ public final class DatatypesTest {
 
 	@Test
 	public void testDateByName() throws SQLException {
-		Locale.setDefault(Locale.ENGLISH);
 		Date date = resultSet.getDate("date_column");
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
@@ -89,7 +87,6 @@ public final class DatatypesTest {
 
 	@Test
 	public void testDateByIndex() throws SQLException {
-		Locale.setDefault(Locale.ENGLISH);
 		Date date = resultSet.getDate(5);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
@@ -101,14 +98,12 @@ public final class DatatypesTest {
 
 	@Test(expected = SQLException.class)
 	public void testDateInvalidByName() throws SQLException {
-		Locale.setDefault(Locale.ENGLISH);
 		resultSet.getDate("date_column_invalid");
 
 	}
 
 	@Test(expected = SQLException.class)
 	public void testDateInvalidByIndex() throws SQLException {
-		Locale.setDefault(Locale.ENGLISH);
 		resultSet.getDate(6);
 	}
 }

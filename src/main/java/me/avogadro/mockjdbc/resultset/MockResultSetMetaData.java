@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -34,7 +35,7 @@ public class MockResultSetMetaData implements ResultSetMetaData {
         }
 
         public static DataType fromString(String spec) {
-            return valueOf(spec.toUpperCase());
+            return valueOf(spec.toUpperCase(Locale.ROOT));
         }
     }
 
@@ -63,7 +64,7 @@ public class MockResultSetMetaData implements ResultSetMetaData {
                 default:
                     throw new IllegalArgumentException("Unknown column spec: " + columnSpec);
             }
-            String key = specElems[0].toUpperCase();
+            String key = specElems[0].toUpperCase(Locale.ROOT);
             columnTypes.put(key, dt);
             names.put(key, specElems[0]);
         }

@@ -3,6 +3,7 @@ package me.avogadro.mockjdbc.boomi;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public final class BoomiExecutionUtil {
 		String exactName = propertyName(resourceName);
 		String value = trimToNull(getDynamicProcessProperty(exactName));
 		if (value == null) {
-			String lowerCaseName = propertyName(resourceName.toLowerCase());
+			String lowerCaseName = propertyName(resourceName.toLowerCase(Locale.ROOT));
 			if (!lowerCaseName.equals(exactName)) {
 				value = trimToNull(getDynamicProcessProperty(lowerCaseName));
 			}
@@ -110,7 +111,7 @@ public final class BoomiExecutionUtil {
 		}
 		String exactName = propertyName(resourceName);
 		boolean ok = setDynamicProcessProperty(exactName, value);
-		String lowerCaseName = propertyName(resourceName.toLowerCase());
+		String lowerCaseName = propertyName(resourceName.toLowerCase(Locale.ROOT));
 		if (!lowerCaseName.equals(exactName)) {
 			ok &= setDynamicProcessProperty(lowerCaseName, value);
 		}
@@ -181,7 +182,7 @@ public final class BoomiExecutionUtil {
 		if (!isBoomi()) {
 			return false;
 		}
-		for (String name : new String[] { RESET_PROPERTY, RESET_PROPERTY.toLowerCase() }) {
+		for (String name : new String[] { RESET_PROPERTY, RESET_PROPERTY.toLowerCase(Locale.ROOT) }) {
 			if (trimToNull(getDynamicProcessProperty(name)) != null) {
 				setDynamicProcessProperty(name, "");
 				return true;

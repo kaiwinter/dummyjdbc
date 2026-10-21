@@ -412,9 +412,9 @@ What this means in practice:
 * **Each getter has its own format.** A date-only value cannot be read with `getTimestamp` (and vice versa) unless you
   change the formats. The `|date` / `|time` / `|timestamp` type in the header only affects `ResultSetMetaData`,
   not parsing.
-* **Date month names depend on the JVM default locale.** `17-MAY-12` works with English, but with an Italian locale you need
-  `17-MAG-12`. Case does not matter, and a 4-digit year (`17-May-2012`) is accepted. Set a numeric pattern (below)
-  to be locale-independent.
+* **Month and day names are always English.** The date, time and timestamp formats use `Locale.ENGLISH` whatever the locale
+  of the machine or of the JVM, so `17-MAY-12` works everywhere. Case does not matter, and a 4-digit year (`17-May-2012`)
+  is accepted. Numbers are locale-independent too: use `.` as decimal separator.
 * **Time seconds are dropped by the default format:** `14:30:15` is read as `14:30:00`. Use `HH:mm:ss` if you need them.
 * **The timestamp default needs the milliseconds:** `20120517 143000` fails, `20120517 143000.000` works.
 * Parsing only checks the beginning of the text, so trailing characters are ignored (`17-MAY-12 10:30` is read as the date

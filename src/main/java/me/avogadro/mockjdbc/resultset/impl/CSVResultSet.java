@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import me.avogadro.mockjdbc.MockJdbcDriver;
@@ -486,7 +487,7 @@ public class CSVResultSet extends MockResultSet {
 	}
 
 	private String rawValueForColumnLabel(String columnLabel, Class<?> clazz) throws SQLException {
-		String key = columnLabel.toUpperCase();
+		String key = columnLabel.toUpperCase(Locale.ROOT);
 
 		// 1: exact match of the header as written (e.g. "ID|INTEGER" or "ID")
 		if (currentEntry.containsKey(key)) {

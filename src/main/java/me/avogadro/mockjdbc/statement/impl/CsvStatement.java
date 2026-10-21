@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -293,12 +294,12 @@ public final class CsvStatement extends StatementAdapter {
 		}
 		
 		// Does a text file for the mock table exist?
-		File resource = tableResources.get(tableName.toLowerCase());
+		File resource = tableResources.get(tableName.toLowerCase(Locale.ROOT));
 		// a /tables/<name>.csv found on the classpath but not in a directory (e.g. inside a jar)
 		URL classpathResource = null;
 		if (resource == null && inMemoryReader == null) {
 			// Try to load /tables/<name>.csv from the classpath: a directory or a jar
-			URL url = CsvStatement.class.getResource("/tables/" + tableName.toLowerCase() + ".csv");
+			URL url = CsvStatement.class.getResource("/tables/" + tableName.toLowerCase(Locale.ROOT) + ".csv");
 			if (url == null) {
 				LOGGER.info("No table definition found for '{}', using MockResultSet.", tableName);
 				return new MockResultSet();
@@ -412,7 +413,7 @@ public final class CsvStatement extends StatementAdapter {
 	}
 
 	private static String resolveHeaderName(String str) {
-	    return str.trim().toUpperCase();
+	    return str.trim().toUpperCase(Locale.ROOT);
     }
 
 

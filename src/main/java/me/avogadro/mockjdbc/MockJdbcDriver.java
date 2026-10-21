@@ -14,6 +14,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
@@ -37,6 +38,16 @@ public final class MockJdbcDriver implements Driver {
 	private static final String DATE_FORMAT = "dd-MMM-yy";
 	private static final String TIME_FORMAT = "HH:mm";
 	private static final String TIMESTAMP_FORMAT = "yyyyMMdd HHmmss.SSS";
+
+	/**
+	 * The locale of the date, time and timestamp formats (month and day names): fixed, so that the result does not
+	 * depend on the locale of the machine or of the JVM.
+	 */
+	private static final Locale DATE_LOCALE = Locale.ENGLISH;
+
+	private static DateFormat dateFormat(String pattern) {
+		return new SimpleDateFormat(pattern, DATE_LOCALE);
+	}
 
 	public static final String STEP_PREFIX = "##STEP";
 
@@ -101,21 +112,21 @@ public final class MockJdbcDriver implements Driver {
 	public static final ThreadLocal<DateFormat> THREAD_LOCAL_DATEFORMAT = new ThreadLocal<DateFormat>() {
 		@Override
 		protected DateFormat initialValue() {
-			return new SimpleDateFormat(DATE_FORMAT);
+			return dateFormat(DATE_FORMAT);
 		}
 	};
 
 	public static final ThreadLocal<DateFormat> THREAD_LOCAL_TIMEFORMAT = new ThreadLocal<DateFormat>() {
 		@Override
 		protected DateFormat initialValue() {
-			return new SimpleDateFormat(TIME_FORMAT);
+			return dateFormat(TIME_FORMAT);
 		}
 	};
 
 	public static final ThreadLocal<DateFormat> THREAD_LOCAL_TIMESTAMPFORMAT = new ThreadLocal<DateFormat>() {
 		@Override
 		protected DateFormat initialValue() {
-			return new SimpleDateFormat(TIMESTAMP_FORMAT);
+			return dateFormat(TIMESTAMP_FORMAT);
 		}
 	};
 
@@ -201,7 +212,7 @@ public final class MockJdbcDriver implements Driver {
 	 */
 	public static int nextOccurrence(String resourceName) {
 		Map<String, Integer> occurrences = occurrences();
-		String key = resourceName.toLowerCase().trim();
+		String key = resourceName.toLowerCase(Locale.ROOT).trim();
 		Integer previous = occurrences.get(key);
 		int occurrence = previous == null ? 1 : previous + 1;
 		occurrences.put(key, occurrence);
@@ -255,7 +266,7 @@ public final class MockJdbcDriver implements Driver {
 		} else {
 			databaseMap = Collections.synchronizedMap(new HashMap<String, File>());
 		}
-		databaseMap.put(tablename.toLowerCase(), csvFile);
+		databaseMap.put(tablename.toLowerCase(Locale.ROOT), csvFile);
 		tableResources.put(DEFAULT_DATABASE, databaseMap);
 	}
 
@@ -279,7 +290,7 @@ public final class MockJdbcDriver implements Driver {
 	public boolean acceptsURL(String url) throws SQLException {
 		return
 			url.equals("any") ||	// used by JUnit test cases
-			url.toLowerCase().startsWith("jdbc::mock::");
+			url.toLowerCase(Locale.ROOT).startsWith("jdbc::mock::");
 	}
 
 	@Override
@@ -317,7 +328,7 @@ public final class MockJdbcDriver implements Driver {
 	 * @param format {@link SimpleDataFormat} pattern
 	 */
 	public static void setDateFormat(String format) {
-		THREAD_LOCAL_DATEFORMAT.set(new SimpleDateFormat(format));
+		THREAD_LOCAL_DATEFORMAT.set(dateFormat(format));
 	}
 	
 	/**
@@ -326,7 +337,7 @@ public final class MockJdbcDriver implements Driver {
 	 * @param format {@link SimpleDataFormat} pattern
 	 */
 	public static void setTimeFormat(String format) {
-		THREAD_LOCAL_TIMEFORMAT.set(new SimpleDateFormat(format));
+		THREAD_LOCAL_TIMEFORMAT.set(dateFormat(format));
 	}
 
 	/**
@@ -335,7 +346,7 @@ public final class MockJdbcDriver implements Driver {
 	 * @param format {@link SimpleDataFormat} pattern
 	 */
 	public static void setTimestampFormat(String format) {
-		THREAD_LOCAL_TIMESTAMPFORMAT.set(new SimpleDateFormat(format));
+		THREAD_LOCAL_TIMESTAMPFORMAT.set(dateFormat(format));
 	}
 
 	/**
@@ -417,7 +428,7 @@ public final class MockJdbcDriver implements Driver {
 	 * @return
 	 */
 	public static String getInMemoryTableResource(String testID) {
-		String value = inMemoryTableResources.get(testID.toLowerCase().trim());
+		String value = inMemoryTableResources.get(testID.toLowerCase(Locale.ROOT).trim());
 		if (value == null) {
 			value = BoomiExecutionUtil.getResourceProperty(testID);
 		}
@@ -455,7 +466,7 @@ public final class MockJdbcDriver implements Driver {
 	 * @param value
 	 */
 	public static void addInMemoryTableResource(String testID, String value) {
-		inMemoryTableResources.put(testID.toLowerCase().trim(), value.trim());
+		inMemoryTableResources.put(testID.toLowerCase(Locale.ROOT).trim(), value.trim());
 	}
 
 	/**

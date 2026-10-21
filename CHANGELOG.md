@@ -1,6 +1,18 @@
 Change Log
 ==========
 
+Unreleased
+----------------------------
+
+ * Behaviour change: the month and day names of the date, time and timestamp formats (`dd-MMM-yy`, `HH:mm`,
+   `yyyyMMdd HHmmss.SSS`, and the patterns set with `setDateFormat` / `setTimeFormat` / `setTimestampFormat`) are parsed
+   and formatted with `Locale.ENGLISH`, whatever the locale of the machine or of the JVM. Before, `dd-MMM-yy` read
+   `17-May-12` on an English machine but failed on an Italian one (`17-mag-12`). Numbers were already locale-independent.
+   Unit tests no longer need `Locale.setDefault`
+ * Fixed: names (column names, `|type` suffixes in CSV headers, table names, query IDs) are upper- and lower-cased with
+   `Locale.ROOT`. In Turkish locales `i` became `İ` and `I` became `ı`, so `id|integer` headers and lookups by name
+   failed on machines with a Turkish locale
+
 Version 2.1.0 (2026-10-19)
 ----------------------------
 
