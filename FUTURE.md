@@ -55,12 +55,26 @@ implemented yet**. Each item says what is missing today and what a change would 
   that is already open no longer sees those tables (new connections reload them).
 * **Idea:** look up the directory on demand (or re-register it after `reset()`) so open connections keep working.
 
-### 7. Table-name detection for INSERT/UPDATE/DELETE
+### 7. Table-name detection
 
-* **Today:** the table of an `INSERT INTO <table> (` / `UPDATE <table>` is matched with letters only (`[a-zA-Z]`), so names
-  containing digits or underscores (`user_roles`, `table2`) are not captured under `<table>_PARAMS`; a `-- QUERY_ID:` comment
-  is needed.
-* **Idea:** accept `[A-Za-z0-9_$.]` (and schema-qualified names), with tests for each form.
+* **Today (INSERT/UPDATE/DELETE):** the table of an `INSERT INTO <table> (` / `UPDATE <table>` / `DELETE [FROM] <table>`
+  is matched with letters only (`[a-zA-Z]`), so these are not captured under `<table>_PARAMS` and need a
+  `-- QUERY_ID:` comment (or a step resource):
+  * names containing digits or underscores (`user_roles`, `table2`);
+  * schema-qualified names (`dbo.orders`);
+  * quoted identifiers (`[orders]`, `"orders"`, `` `orders` ``);
+  * `INSERT INTO orders VALUES (...)` without a column list (the pattern wants `(` right after the name).
+* **Today (SELECT):** `TABLENAME_PATTERN` (`.*from\s*(\S*)\s?.*`) is greedy, so the name is the word after the **last**
+  `from` of the whole SQL: `... WHERE id IN (SELECT id FROM blocked)` gives `blocked)`, and a column such as
+  `created_from = ?` after the real `FROM` probably gives `=` (to confirm with a test). `FROM dbo.customers` gives
+  `dbo.customers`, `FROM [customers]` gives `[customers]`.
+* **Idea:** one shared identifier rule for reads and writes: `[A-Za-z0-9_$]` parts, optionally quoted with `[]`, `""`
+  or backticks, optionally schema-qualified (resource name = the last part, lower case, or the full name as a fallback);
+  for SELECT, the first `FROM` at nesting level 0 and a word boundary before `from`; INSERT with or without the column
+  list. Tests for each form. Seen while writing the `boomi-unit-testing` skill (2026-10-21): with mockjdbc as the
+  driver, the Boomi Database V2 Dynamic Insert generates `Insert into payments(pay_id,amount) values (?,?)` (no schema
+  even with `schemaName` set, no quotes), so the generated SQL is already captured; the limits above hit the SQL
+  written by hand in Legacy and V2 operations.
 
 ### 8. Precedence between files and in-memory resources
 
