@@ -183,4 +183,69 @@ public final class MockDatabaseMetaDataTest {
 		Assert.assertTrue(resultSet.next());
 		Assert.assertEquals("first", resultSet.getString("step"));
 	}
+	@Test
+	public void testGetProcedureColumnsFromTheSignature() throws SQLException {
+		MockJdbcDriver.addInMemoryTableResource("spSave",
+				"ret_status|integer,in_name,in_value|integer,inout_counter|decimal,out_message\n0,,,1,ok");
+		ResultSet columns = metaData.getProcedureColumns(null, null, "spSave", null);
+
+		Assert.assertEquals(20, columns.getMetaData().getColumnCount());
+		Assert.assertTrue(columns.next());
+		Assert.assertEquals("@RETURN_VALUE", columns.getString("COLUMN_NAME"));
+		Assert.assertEquals(DatabaseMetaData.procedureColumnReturn, columns.getShort(5));
+		Assert.assertEquals("0", columns.getString("ORDINAL_POSITION"));
+		Assert.assertTrue(columns.next());
+		Assert.assertEquals("spSave", columns.getString("PROCEDURE_NAME"));
+		Assert.assertEquals("name", columns.getString(4));
+		Assert.assertEquals(DatabaseMetaData.procedureColumnIn, columns.getShort(5));
+		Assert.assertEquals(String.valueOf(Types.VARCHAR), columns.getString(6));
+		Assert.assertEquals("1", columns.getString("ORDINAL_POSITION"));
+		Assert.assertTrue(columns.next());
+		Assert.assertEquals("value", columns.getString(4));
+		Assert.assertEquals(String.valueOf(Types.INTEGER), columns.getString(6));
+		Assert.assertTrue(columns.next());
+		Assert.assertEquals("counter", columns.getString(4));
+		Assert.assertEquals(DatabaseMetaData.procedureColumnInOut, columns.getShort(5));
+		Assert.assertEquals(String.valueOf(Types.DECIMAL), columns.getString(6));
+		Assert.assertTrue(columns.next());
+		Assert.assertEquals("message", columns.getString(4));
+		Assert.assertEquals(DatabaseMetaData.procedureColumnOut, columns.getShort(5));
+		Assert.assertEquals("4", columns.getString("ORDINAL_POSITION"));
+		Assert.assertFalse(columns.next());
+	}
+
+	@Test
+	public void testGetProcedureColumnsColumnPatternAndCase() throws SQLException {
+		MockJdbcDriver.addInMemoryTableResource("spSave", "in_name,out_size|integer,out_status\n,1,ok");
+		ResultSet columns = metaData.getProcedureColumns(null, null, "SPSAVE", "s%");
+
+		Assert.assertTrue(columns.next());
+		Assert.assertEquals("size", columns.getString("COLUMN_NAME"));
+		Assert.assertTrue(columns.next());
+		Assert.assertEquals("status", columns.getString("COLUMN_NAME"));
+		Assert.assertFalse(columns.next());
+	}
+
+	@Test
+	public void testGetProcedureColumnsWithSchemaAndOccurrence() throws SQLException {
+		MockJdbcDriver.addInMemoryTableResource("dbo.spA", "in_a,out_b\n,1");
+		MockJdbcDriver.addInMemoryTableResource("spB#1", "in_x,out_y\n,1");
+
+		ResultSet withSchema = metaData.getProcedureColumns(null, "dbo", "spA", null);
+		ResultSet byOccurrence = metaData.getProcedureColumns(null, "dbo", "spB", null);
+
+		Assert.assertTrue(withSchema.next());
+		Assert.assertEquals("a", withSchema.getString("COLUMN_NAME"));
+		Assert.assertTrue(byOccurrence.next());
+		Assert.assertEquals("x", byOccurrence.getString("COLUMN_NAME"));
+	}
+
+	@Test
+	public void testGetProcedureColumnsIsEmptyWithoutASignature() throws SQLException {
+		MockJdbcDriver.addInMemoryTableResource("spList", "id,name\n1,a");
+
+		Assert.assertFalse(metaData.getProcedureColumns(null, null, "spList", null).next());
+		Assert.assertFalse(metaData.getProcedureColumns(null, null, "missing", null).next());
+		Assert.assertFalse(metaData.getProcedureColumns(null, null, "%", null).next());
+	}
 }

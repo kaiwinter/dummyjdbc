@@ -1,6 +1,7 @@
 package me.avogadro.mockjdbc.connection.impl;
 
 import java.io.File;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,6 +9,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import me.avogadro.mockjdbc.connection.ConnectionAdapter;
+import me.avogadro.mockjdbc.statement.impl.CsvCallableStatement;
 import me.avogadro.mockjdbc.statement.impl.CsvPreparedStatement;
 import me.avogadro.mockjdbc.statement.impl.CsvStatement;
 
@@ -76,6 +78,22 @@ public class MockConnection extends ConnectionAdapter {
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
 		return new CsvPreparedStatement(tableResources, sql);
 	};
+
+	@Override
+	public CallableStatement prepareCall(String sql) throws SQLException {
+		return new CsvCallableStatement(tableResources, sql);
+	}
+
+	@Override
+	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+		return prepareCall(sql);
+	}
+
+	@Override
+	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
+			int resultSetHoldability) throws SQLException {
+		return prepareCall(sql);
+	}
 
 	@Override
 	public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {

@@ -4,6 +4,17 @@ Change Log
 Unreleased
 ----------------------------
 
+ * New: `Connection.prepareCall` returns a `CallableStatement` (before, it returned `null`). A resource whose CSV
+   header has only `in_`, `out_`, `inout_` and `ret_` columns is the signature of the procedure: the columns follow the
+   order of the `?` of the call (`ret_` is the optional return value of `{? = call ...}`), the `|type` is the
+   parameter type, the first row gives the OUT values (IN values are ignored). `registerOutParameter`, `getXxx` and
+   `setXxx` work by index and by name; `getObject` follows the registered SQL type. Any other header is the result set
+   of the procedure, as with `EXEC`. Calls report no update counts (`getUpdateCount()` is -1) and one result set at
+   most. `<proc>_PARAMS` holds the IN and IN OUT values only
+ * New: `DatabaseMetaData.getProcedureColumns` describes the parameters of procedures with a signature resource
+   (return value first, as `@RETURN_VALUE`)
+ * Fixed: `PreparedStatement.getMetaData()` returns the columns of the last result set (before, `null`)
+
  * Behaviour change: the table of a query is the one after the **first** `FROM` outside parentheses. Before, it was
    the word after the last `from` in the text: `SELECT * FROM orders WHERE id IN (SELECT id FROM blocked)` used
    `blocked)`, now `orders`. Strings, comments and quoted names are skipped (`'from x'`, `created_from`), and

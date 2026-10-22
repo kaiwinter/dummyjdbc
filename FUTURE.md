@@ -41,17 +41,17 @@ implemented yet**. Each item says what is missing today and what a change would 
 
 ## Resources and connections
 
-### 5. CallableStatement (`Connection.prepareCall`)
+### 5. Stored procedures: cursors, several result sets, functions
 
-* **Today:** `prepareCall(...)` returns `null`, so code (or a Boomi "Stored Procedure" operation) that calls a
-  procedure through a `CallableStatement` fails. Stored procedures work only through `prepareStatement` /
-  `createStatement` with `EXEC`, `EXECUTE`, `CALL` or `{call ...}`.
-* **Idea:** return a `CallableStatement` built on `CsvPreparedStatement` (same lookup and parameter capture), with OUT
-  parameters registered and read back from the CSV result or from dedicated resources.
-* **Impact on Boomi unit tests:** a subprocess that calls a procedure through a "Stored Procedure" operation cannot be
-  unit tested with mockjdbc today, unless the procedure is called from a SQL operation (`EXEC` / `{call ...}`), which
-  means changing the process under test. Seen while writing the `boomi-unit-testing` skill (2026-10-21); which
-  Legacy and Database V2 operation types go through `prepareCall` is still to be confirmed with a run.
+* **Today:** `prepareCall` supports OUT parameters (signature resources with `in_`/`out_`/`inout_`/`ret_` columns) and
+  one result set per call (see [FEATURES.md, section 3 c](FEATURES.md#c-stored-procedures)). Not supported: REF CURSOR
+  OUT parameters (`getObject` returning a `ResultSet`), several result sets (`getMoreResults`), a procedure returning
+  both OUT parameters and a result set (also IN parameters with a result set: the Database V2 operation then
+  calls it without parameters, so the IN values are not captured), update counts before the result set, and `getFunctionColumns` for functions.
+* **Idea:** extra resources per procedure, e.g. `<proc>_<param>` for a cursor parameter and `<proc>_RS2`, `<proc>_RS3`
+  for further result sets; a function signature served by `getFunctionColumns`.
+* **Impact on Boomi unit tests:** processes using Oracle cursors, several result sets or the Database V2 *Execute
+  Function* operation cannot be mocked yet.
 
 ### 6. Database directories loaded lazily
 

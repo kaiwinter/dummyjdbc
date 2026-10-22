@@ -19,6 +19,7 @@ import me.avogadro.mockjdbc.MockJdbcDriver;
 import me.avogadro.mockjdbc.resultset.MockResultSetMetaData;
 import me.avogadro.mockjdbc.resultset.impl.CSVResultSet;
 import me.avogadro.mockjdbc.statement.impl.CsvStatement;
+import me.avogadro.mockjdbc.statement.impl.ProcedureSignature;
 
 /**
  * Metadata of the mock database. Descriptive values are never <code>null</code>. {@link #getColumns} describes the
@@ -43,6 +44,14 @@ public class MockDatabaseMetaData implements DatabaseMetaData {
             "REMARKS", "COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", "ORDINAL_POSITION",
             "IS_NULLABLE", "SCOPE_CATALOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE", "IS_AUTOINCREMENT",
             "IS_GENERATEDCOLUMN" };
+
+    private static final String[] PROCEDURE_COLUMNS_COLUMNS = { "PROCEDURE_CAT", "PROCEDURE_SCHEM", "PROCEDURE_NAME",
+            "COLUMN_NAME", "COLUMN_TYPE", "DATA_TYPE", "TYPE_NAME", "PRECISION", "LENGTH", "SCALE", "RADIX", "NULLABLE",
+            "REMARKS", "COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", "ORDINAL_POSITION",
+            "IS_NULLABLE", "SPECIFIC_NAME" };
+
+    /** PRECISION, LENGTH and CHAR_OCTET_LENGTH reported for procedure parameters */
+    private static final int PROCEDURE_COLUMN_PRECISION = 60;
 
     /** DECIMAL_DIGITS reported for |double and |decimal columns (the CSV does not declare a scale) */
     static final int DECIMAL_DIGITS = 10;
@@ -554,8 +563,82 @@ public class MockDatabaseMetaData implements DatabaseMetaData {
         return emptyResultSet("getProcedures", "PROCEDURE_CAT", "PROCEDURE_SCHEM", "PROCEDURE_NAME", "RESERVED1", "RESERVED2", "RESERVED3", "REMARKS", "PROCEDURE_TYPE", "SPECIFIC_NAME");
     }
 
-    @Override public ResultSet getProcedureColumns(String s, String s2, String s3, String s4) throws SQLException {
-        return emptyResultSet("getProcedureColumns", "PROCEDURE_CAT", "PROCEDURE_SCHEM", "PROCEDURE_NAME", "COLUMN_NAME", "COLUMN_TYPE", "DATA_TYPE", "TYPE_NAME", "PRECISION", "LENGTH", "SCALE", "RADIX", "NULLABLE", "REMARKS", "COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", "ORDINAL_POSITION", "IS_NULLABLE", "SPECIFIC_NAME");
+    /**
+     * The parameters of a stored procedure whose resource declares a {@link ProcedureSignature} (header with
+     * <code>in_</code>, <code>out_</code>, <code>inout_</code> and <code>ret_</code> columns), found as for a call:
+     * <code>schema.procedure</code> first when a schema is given, then <code>procedure</code>; the plain resource,
+     * else its first occurrence (<code>procedure#1</code>). The return value comes first, named
+     * <code>@RETURN_VALUE</code>; the other parameters follow in the order of the header, named without the prefix.
+     * Catalog is ignored, the procedure name must be exact (case insensitive), the column pattern supports
+     * <code>%</code> and <code>_</code>. Empty when no signature is declared.
+     */
+    @Override public ResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern,
+            String columnNamePattern) throws SQLException {
+        List<LinkedHashMap<String, String>> rows = new ArrayList<LinkedHashMap<String, String>>();
+        String procedure = procedureNamePattern == null ? "" : procedureNamePattern.trim();
+        ProcedureSignature signature = procedure.isEmpty() || "%".equals(procedure) ? null
+                : findSignature(schemaPattern, procedure);
+        if (signature != null) {
+            Pattern columnPattern = likePattern(columnNamePattern);
+            List<ProcedureSignature.Parameter> parameters = new ArrayList<ProcedureSignature.Parameter>();
+            if (signature.getReturnValue() != null) {
+                parameters.add(signature.getReturnValue());
+            }
+            parameters.addAll(signature.getParameters());
+            int position = 0;
+            for (ProcedureSignature.Parameter parameter : parameters) {
+                boolean returnValue = parameter.getMode() == ProcedureSignature.Mode.RETURN;
+                String name = returnValue ? "@RETURN_VALUE" : parameter.getName();
+                int ordinal = returnValue ? 0 : ++position;
+                if (columnPattern != null && !columnPattern.matcher(name).matches()) {
+                    continue;
+                }
+                int type = parameter.getSqlType();
+                boolean decimal = type == Types.DOUBLE || type == Types.DECIMAL;
+                LinkedHashMap<String, String> row = new LinkedHashMap<String, String>();
+                row.put("PROCEDURE_CAT", null);
+                row.put("PROCEDURE_SCHEM", null);
+                row.put("PROCEDURE_NAME", procedure);
+                row.put("COLUMN_NAME", name);
+                row.put("COLUMN_TYPE", String.valueOf(parameter.getMode().getColumnType()));
+                row.put("DATA_TYPE", String.valueOf(type));
+                row.put("TYPE_NAME", parameter.getTypeName());
+                row.put("PRECISION", String.valueOf(PROCEDURE_COLUMN_PRECISION));
+                row.put("LENGTH", String.valueOf(PROCEDURE_COLUMN_PRECISION));
+                row.put("SCALE", String.valueOf(decimal ? DECIMAL_DIGITS : 0));
+                row.put("RADIX", "10");
+                row.put("NULLABLE", String.valueOf(procedureNullable));
+                row.put("REMARKS", null);
+                row.put("COLUMN_DEF", null);
+                row.put("SQL_DATA_TYPE", "0");
+                row.put("SQL_DATETIME_SUB", "0");
+                row.put("CHAR_OCTET_LENGTH", String.valueOf(PROCEDURE_COLUMN_PRECISION));
+                row.put("ORDINAL_POSITION", String.valueOf(ordinal));
+                row.put("IS_NULLABLE", "YES");
+                row.put("SPECIFIC_NAME", procedure);
+                rows.add(row);
+            }
+        }
+        return new CSVResultSet("getProcedureColumns",
+                new MockResultSetMetaData("getProcedureColumns", PROCEDURE_COLUMNS_COLUMNS), rows);
+    }
+
+    /** the signature declared for a procedure, or null */
+    private ProcedureSignature findSignature(String schema, String procedure) throws SQLException {
+        List<String> names = new ArrayList<String>();
+        if (schema != null && !schema.trim().isEmpty() && !"%".equals(schema.trim())) {
+            names.add(schema.trim() + "." + procedure);
+        }
+        names.add(procedure);
+        for (String name : names) {
+            for (String resource : new String[] { name, name + MockJdbcDriver.OCCURRENCE_SEPARATOR + 1 }) {
+                ProcedureSignature signature = ProcedureSignature.of(CsvStatement.loadTable(tableResources, resource));
+                if (signature != null) {
+                    return signature;
+                }
+            }
+        }
+        return null;
     }
 
     @Override public ResultSet getTables(String s, String s2, String s3, String[] strings) throws SQLException {

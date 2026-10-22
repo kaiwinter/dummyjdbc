@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -46,7 +47,8 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	private final CsvStatement statement;
 	private final String sql;
 
-	private ResultSet currentResultSet;
+	/** result set of the last query (also read by {@link CsvCallableStatement}) */
+	ResultSet currentResultSet;
 
 	/** true while {@link #execute(String)} runs: the capture reuses the occurrence number of its query */
 	private boolean reuseQueryOccurrence = false;
@@ -160,6 +162,14 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	 * @return
 	 */
 	String buildParamsString() {
+		return paramsString(params);
+	}
+
+	/**
+	 * @param params values by SQL parameter index (index 0 unused)
+	 * @return the values joined by commas, trailing empty values removed
+	 */
+	static String paramsString(Object[] params) {
 		// 1: build the string (space separated)
 		StringBuilder s = new StringBuilder();
 		for (int i = 1; i < params.length; i++) { // SQL param index starts from 1 !!
@@ -344,6 +354,15 @@ public class CsvPreparedStatement extends PreparedStatementAdapter {
 	@Override
 	public ResultSet getResultSet() throws SQLException {
 		return currentResultSet;
+	}
+
+	/**
+	 * The columns of the result set of the last query (e.g. the Boomi SQL lookup reads them after <code>execute()</code>);
+	 * <code>null</code> before the statement is executed.
+	 */
+	@Override
+	public ResultSetMetaData getMetaData() throws SQLException {
+		return currentResultSet == null ? null : currentResultSet.getMetaData();
 	}
 
 	@Override

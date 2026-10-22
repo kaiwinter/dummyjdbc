@@ -218,6 +218,11 @@ If something does not work:
 * **Database V2 operations** (Standard Get/Insert/Update/Delete, Dynamic Insert, ...): define every table the operation
   uses, even with the header only, so that the connector knows its columns
   ([Database V2 operations](FEATURES.md#database-v2-operations)).
-* **Stored procedures**: `EXEC my_proc ?` reads `mockjdbc_my_proc` and captures `mockjdbc_my_proc_PARAMS`.
+* **Stored procedures**: `EXEC my_proc ?` reads `mockjdbc_my_proc` and captures `mockjdbc_my_proc_PARAMS`. For a
+  procedure with OUT parameters (Database profile *Stored Procedure Read*, SQL Lookup, Database V2 *Stored Procedure*,
+  parameter value *Stored Procedure*) give `mockjdbc_my_proc` a signature header, one column per parameter in call
+  order, prefixed `in_`, `out_` or `inout_` (optionally a `ret_` column for the return value); its first row holds
+  the OUT values, the IN values are ignored. E.g. `in_name,in_value|integer,out_size|integer,out_status` with the row
+  `,,42,OK` ([stored procedures](FEATURES.md#stored-procedures)).
 
 The editable sources of the pictures of this tutorial are in [`docs/sources`](docs/sources).

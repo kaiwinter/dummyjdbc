@@ -154,7 +154,66 @@ per query, not per table, and a test does not change when the SQL changes.
 
 `EXEC my_proc ...`, `EXECUTE my_proc ...`, `CALL my_proc(...)` and the JDBC escape `{call my_proc(...)}` (also
 `{? = call my_proc(...)}`) resolve to the resource `my_proc`, so stored-procedure results can be mocked the same way
-as tables. The call can span several lines.
+as tables. The call can span several lines. This works with `prepareStatement`, `createStatement` and
+`prepareCall`.
+
+#### OUT parameters (`prepareCall`)
+
+A procedure that returns its results in **OUT parameters** is mocked with a resource whose header is the
+**signature** of the procedure: every column starts with a prefix that gives the direction of the parameter.
+
+| Prefix | Parameter | Value in the first data row |
+|--------|-----------|-----------------------------|
+| `in_` | IN | ignored (may be empty or filled) |
+| `out_` | OUT | returned by `getXxx(index)` |
+| `inout_` | IN OUT | returned by `getXxx(index)` |
+| `ret_` | return value of `{? = call ...}` (optional, at most one) | returned by `getXxx(1)` |
+
+```
+in_name,in_value|integer,out_size|integer,out_status,out_message
+,,42,OK,Saved
+```
+
+```java
+CallableStatement call = connection.prepareCall("{call spSave(?, ?, ?, ?, ?)}");
+call.setString(1, "mario");
+call.setInt(2, 5);
+call.registerOutParameter(3, Types.INTEGER);
+call.registerOutParameter(4, Types.VARCHAR);
+call.registerOutParameter(5, Types.VARCHAR);
+call.execute();                 // false: OUT parameters, no result set
+
+call.getInt(3);                 // 42
+call.getString("status");       // "OK" (by name)
+MockJdbcDriver.getInMemoryTableResource("spSave_PARAMS");  // "mario,5"
+```
+
+* The order of the `in_`, `out_` and `inout_` columns is the order of the `?` of the call. The `ret_` column is
+  parameter 1 when the SQL starts with `{? =`; without `{? =` it is skipped, and with `{? =` but no `ret_` column
+  parameter 1 has no value (reading it fails) while the others keep their positions.
+* The name after the prefix is the parameter name, for `setXxx(name, ...)`, `registerOutParameter(name, ...)` and
+  `getXxx(name)` (case insensitive; `out_size`, `@size` and `size` are the same name).
+* The optional `|type` of a column (see [section 9](#9-csv-format-reference)) is the type of the parameter: an empty
+  value in a typed column is SQL `NULL` (`wasNull()` is `true`). A header without data rows gives `NULL` for every
+  OUT parameter.
+* `getObject(index)` returns the Java type of the SQL type registered with `registerOutParameter` (`Integer` for
+  `INTEGER`, `BigDecimal` for `NUMERIC`/`DECIMAL`, `Double` for `FLOAT`/`DOUBLE`, `Timestamp` for `TIMESTAMP`,
+  `String` for `CHAR`/`VARCHAR`, ...), otherwise the type declared in the header.
+* Reading an IN parameter, or a parameter the header does not declare, throws an `SQLException`.
+* Different results for different calls work as for tables: `spSave?mario,5` for given IN values
+  ([section 4](#4-different-results-for-different-parameters)), `spSave#2` for the second call
+  ([section 5](#repeated-use-of-the-same-resource-users1-users2)).
+* The IN (and IN OUT) values are captured as `spSave_PARAMS` ([section 6](#6-capturing-statement-parameters)), OUT
+  parameters and the return value left out.
+
+#### Result sets (`prepareCall`)
+
+A resource with **any** column without one of those prefixes is the result set of the procedure, as with `EXEC`:
+`execute()` returns `true` and `getResultSet()` (or `executeQuery()`) returns its rows.
+
+A call never has update counts (`getUpdateCount()` is `-1`) nor more than one result set (`getMoreResults()` is
+`false`). `DatabaseMetaData.getProcedureColumns` describes the parameters of every procedure with a signature
+resource ([section 10](#10-resolution-order-and-good-to-know)).
 
 ### Fallbacks
 
@@ -253,7 +312,7 @@ of every prepared statement **except SELECTs** as a comma-separated string, unde
 | `INSERT INTO users (...) VALUES (?, ?)` | `users_PARAMS` |
 | `UPDATE users SET ...` | `users_PARAMS` |
 | `DELETE FROM users WHERE ...` | `users_PARAMS` |
-| `EXEC my_proc ?, ?`, `EXECUTE my_proc ...`, `CALL my_proc(?)`, `{call my_proc(?)}` | `my_proc_PARAMS` |
+| `EXEC my_proc ?, ?`, `EXECUTE my_proc ...`, `CALL my_proc(?)`, `{call my_proc(?)}` | `my_proc_PARAMS` (with `prepareCall`: IN and IN OUT parameters only, see [section 3 c](#out-parameters-preparecall)) |
 | any statement but a SELECT with a `-- QUERY_ID: name` (or `-- TESTCASE: name`) comment | `name_PARAMS` |
 | any statement but a SELECT run on a step resource ([section 5](#5-step-based-results-a-scripted-sequence)) | `##STEP<n>_PARAMS` |
 
@@ -500,8 +559,14 @@ Tips:
   space (identifiers are never quoted). `getColumns(catalog, schema, table, columnPattern)` returns one row per column
   of the table's CSV header, with the table found exactly as for a query (in memory, Boomi property, file); a header-only
   CSV is enough. `DATA_TYPE`/`TYPE_NAME` come from the `|type` of the header (`VARCHAR` when none), `DECIMAL_DIGITS` is
-  10 for `double`/`decimal` and 0 otherwise, `IS_AUTOINCREMENT` is `NO`. Every other method returning a `ResultSet`
-  (`getTables`, `getPrimaryKeys`, ...) returns an empty one with the standard JDBC columns. No method returns `null`,
+  10 for `double`/`decimal` and 0 otherwise, `IS_AUTOINCREMENT` is `NO`.
+  `getProcedureColumns(catalog, schema, procedure, columnPattern)` describes the parameters of a procedure whose
+  resource is a signature ([section 3 c](#out-parameters-preparecall)): `schema.procedure` first when a schema is
+  given, then `procedure`, the plain resource or else its first occurrence (`procedure#1`). The return value comes
+  first, named `@RETURN_VALUE` (`ORDINAL_POSITION` 0), then the parameters in header order, named without the prefix,
+  with `COLUMN_TYPE` IN, IN OUT, OUT or RETURN and `DATA_TYPE`/`TYPE_NAME` from the `|type`. Every other method
+  returning a `ResultSet` (`getTables`, `getPrimaryKeys`, `getProcedures`, ...) returns an empty one with the standard
+  JDBC columns. No method returns `null`,
   so tools that inspect the metadata before running a query (e.g. the Boomi Database V2 connector) work.
 * **Character encoding:** in-memory CSV strings are used as they are, so any Unicode text works regardless of the VM settings.
   CSV **files** (and `InputStream`s) are read with the default charset of the VM; make sure your files match it.
@@ -590,6 +655,33 @@ according to the column type, so:
   (`WHERE id NOT IN (SELECT ...)`): without it the connector itself rejects the query, before the driver sees it, with
   error 405 `Kindly select the IN clause check box only if Sql Query contains IN Clause !` (the output document holds
   the error). A `NOT EXISTS (SELECT ...)` subquery needs no option.
+
+#### Stored procedures
+
+Define the resource of the procedure as a Dynamic Process Property `mockjdbc_<procedure>` (or a CSV in the library),
+with a signature header for OUT parameters or a plain header for a result set
+([section 3 c](#c-stored-procedures)):
+
+| Boomi | Resource to define | What the process gets |
+|-------|--------------------|-----------------------|
+| Database (Legacy) profile *Stored Procedure Read* with OUT parameters | signature, `in_`/`out_`/`inout_` (and `ret_` for a *Return* parameter) columns in the order of the profile parameters | the OUT values, in the output fields linked to the parameters |
+| Database (Legacy) profile *Stored Procedure Read* returning rows | plain header (the result set) | one row per document |
+| Database (Legacy) profile *Stored Procedure Write* | none needed | the IN values in `mockjdbc_<procedure>_PARAMS` |
+| Map function *SQL Lookup*, type Stored Procedure, *Output Parameters* | signature with the inputs first, then the outputs | the output values |
+| Map function *SQL Lookup*, type Stored Procedure, *Result Set* | plain header | the columns of the first row |
+| Parameter value *Stored Procedure* (Set Properties, Decision, ...) | signature: the *Output Column* is the position of an `out_` column | that OUT value |
+| Program Command, type *Stored Procedure* | none needed | the IN values in `mockjdbc_<procedure>_PARAMS` |
+| Program Command, type *SQL Statement* (INSERT, UPDATE, DELETE) | none needed | the parameters in `mockjdbc_<table>_PARAMS` |
+| Database V2 operation *Stored Procedure* with OUT parameters | signature with the parameter names of the request and response profiles | a JSON object with one field per OUT parameter |
+| Database V2 operation *Stored Procedure* returning rows | plain header (the result set) | one document per row; the IN values are not captured |
+
+* The Database V2 operation needs the parameters of the procedure, which mockjdbc describes from the signature
+  (`getProcedureColumns`): name the columns after the fields of the profiles (`in_customer_id` for `customer_id`) and
+  give them a `|type` to have numbers bound as numbers. A procedure mocked with a result set has no signature, so the
+  operation calls it without parameters: the rows are returned, the IN values are not captured.
+* A procedure called by different steps can return different values per call (`mockjdbc_<procedure>#1`, `#2`, ...) or
+  per IN values (`mockjdbc_<procedure>?mario,5`), as for tables.
+* Cursor (REF CURSOR) parameters are not supported.
 
 ### Detection
 
