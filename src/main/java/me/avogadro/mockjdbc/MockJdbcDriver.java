@@ -53,7 +53,7 @@ public final class MockJdbcDriver implements Driver {
 
 	/** Version of the driver, also reported by the database metadata */
 	public static final int VERSION_MAJOR = 2;
-	public static final int VERSION_MINOR = 1;
+	public static final int VERSION_MINOR = 2;
 	
 	/** Separator of the occurrence number in resource names: <code>users#2</code> is the second use of <code>users</code> */
 	public static final String OCCURRENCE_SEPARATOR = "#";

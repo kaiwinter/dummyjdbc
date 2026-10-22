@@ -93,6 +93,10 @@ without a column list) is done (`SqlNames`, see FEATURES.md section 3a). Still n
   by Boomi itself.
 * **Legacy:** Boomi does not add a removed jar to `ignored_jars.txt` of `userlib\database`, so the jar stays on the
   classpath and the cleanup never tries to delete it.
+* **Boomi cloud runtime:** the same happens there, where the runtime cannot be stopped or cleaned by the account. Seen in
+  October 2026: after each library deploy the Database V2 connector used the new jar, while the Legacy connector kept
+  running an old mockjdbc build (2.1.0 table-name detection and 2.2.0 stored procedures missing). Verify Legacy changes
+  on a local Atom.
 * **Idea:** investigate with Boomi support (class loader lifecycle of Custom Libraries on Windows); nothing else known
   to change in the driver.
 

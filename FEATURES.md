@@ -551,11 +551,11 @@ Tips:
   Boomi** ([section 11](#11-running-inside-boomi)). A registered driver keeps its class loader (and its jar file) in
   use: containers that unload the driver can call `MockJdbcDriver.deregister()` (it does nothing when the driver is not
   registered); `MockJdbcDriver.isRegistered()` tells which case applies. At startup the driver logs one line through
-  `java.util.logging`: `MockJDBC 2.1 registered in DriverManager: true` (or `false`).
+  `java.util.logging`: `MockJDBC 2.2 registered in DriverManager: true` (or `false`).
 * Not every JDBC method is implemented; unsupported ones throw `UnsupportedOperationException`.
 * `setMaxRows(n)` limits the rows returned by the next queries of the statement (0 = no limit).
 * No key is ever generated: `getGeneratedKeys()` returns an empty result set (never `null`).
-* `Connection.getMetaData()`: product and driver name are `MockJDBC`, version `2.1`, the identifier quote string is a
+* `Connection.getMetaData()`: product and driver name are `MockJDBC`, version `2.2`, the identifier quote string is a
   space (identifiers are never quoted). `getColumns(catalog, schema, table, columnPattern)` returns one row per column
   of the table's CSV header, with the table found exactly as for a query (in memory, Boomi property, file); a header-only
   CSV is enough. `DATA_TYPE`/`TYPE_NAME` come from the `|type` of the header (`VARCHAR` when none), `DECIMAL_DIGITS` is
@@ -593,7 +593,7 @@ In Boomi the driver runs from a **Custom Library** component that holds three ja
 #### Setting up the Custom Library
 
 1. **Download the jars**:
-   * [mockjdbc-2.1.0.jar](https://github.com/SimoneAvogadro/mockjdbc/releases/download/mockjdbc-2.1.0/mockjdbc-2.1.0.jar)
+   * [mockjdbc-2.2.0.jar](https://github.com/SimoneAvogadro/mockjdbc/releases/download/mockjdbc-2.2.0/mockjdbc-2.2.0.jar)
      (other versions on the [releases](https://github.com/SimoneAvogadro/mockjdbc/releases) page, or build it with
      `mvn package`);
    * [opencsv-2.3.jar](https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3.jar);
@@ -693,7 +693,7 @@ The driver looks for the Boomi class `com.boomi.execution.ExecutionUtil` on the 
 
 **No registration in `DriverManager` inside Boomi.** When the class `com.boomi.execution.ExecutionManager` is present
 the driver does not register itself in `DriverManager` (the container log shows
-`MockJDBC 2.1 registered in DriverManager: false`): Boomi instantiates the driver by class name and calls `connect()`
+`MockJDBC 2.2 registered in DriverManager: false`): Boomi instantiates the driver by class name and calls `connect()`
 directly, and a registered driver would keep the class loader of the Custom Library, and all its jars, in use. As a
 consequence, inside Boomi `DriverManager.getConnection(...)` (e.g. from a script) does not find mockjdbc: create the
 driver with `new me.avogadro.mockjdbc.MockJdbcDriver()` and call `connect("any", new Properties())`.

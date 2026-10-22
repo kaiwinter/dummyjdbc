@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-Unreleased
+Version 2.2.0 (2026-10-22)
 ----------------------------
 
  * New: `Connection.prepareCall` returns a `CallableStatement` (before, it returned `null`). A resource whose CSV
@@ -14,6 +14,9 @@ Unreleased
  * New: `DatabaseMetaData.getProcedureColumns` describes the parameters of procedures with a signature resource
    (return value first, as `@RETURN_VALUE`)
  * Fixed: `PreparedStatement.getMetaData()` returns the columns of the last result set (before, `null`)
+ * Documentation: which resource to define for each Boomi way of calling a procedure (Database profile Stored
+   Procedure Read/Write, SQL Lookup, parameter value Stored Procedure, Program Command, Database V2 Stored Procedure)
+   in FEATURES.md, section 11; FUTURE.md lists what is not supported yet (cursors, several result sets, functions)
 
  * Behaviour change: the table of a query is the one after the **first** `FROM` outside parentheses. Before, it was
    the word after the last `from` in the text: `SELECT * FROM orders WHERE id IN (SELECT id FROM blocked)` used
